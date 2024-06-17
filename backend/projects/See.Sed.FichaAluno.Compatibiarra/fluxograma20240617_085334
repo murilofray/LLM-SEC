@@ -1,0 +1,20 @@
+digraph {
+	graph [rankdir=LR]
+	A [label="Início" fillcolor=lightblue fontname=Arial fontsize=10 shape=box style=filled]
+	B [label="Carregar Unidades e Alunos" fillcolor=lightblue fontname=Arial fontsize=10 shape=box style=filled]
+	C [label="Alocar Alunos" fillcolor=lightblue fontname=Arial fontsize=10 shape=box style=filled]
+	D [label="Transferência de Dados" fillcolor=lightblue fontname=Arial fontsize=10 shape=box style=filled]
+	E [label="Log e Notificação" fillcolor=lightblue fontname=Arial fontsize=10 shape=box style=filled]
+	F [label=Fim fillcolor=lightblue fontname=Arial fontsize=10 shape=box style=filled]
+	A -> B [color=gray fontname=Arial fontsize=8]
+	B -> C [color=gray fontname=Arial fontsize=8]
+	C -> D [color=gray fontname=Arial fontsize=8]
+	D -> E [color=gray fontname=Arial fontsize=8]
+	E -> F [color=gray fontname=Arial fontsize=8]
+	label="
+    Legenda:
+    Nós do Fluxograma: Nome da Função 
+                      [Saída Gerada Caso Tenha] - 
+    Conexões - Condição para ir para o próximo nó
+    " labeljust=left labelloc=bottom
+}

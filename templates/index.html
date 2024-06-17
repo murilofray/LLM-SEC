@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="static\styles\styles.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.3.2/purify.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+        integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>Uni1500</title>
+    <link rel="icon" href="static\imagens\Logo2.jpg" type="image/png">
+</head>
+
+<body>
+    <main>
+        <aside id="slide-bar">
+            <div id="user-info">
+                <i class="fa-regular fa-user"></i>
+                <p id="user-name">{{ username }}</p> <!-- Nome de usuário -->
+            </div>
+            <button id="add-chat-button">Novo Chat</button>
+             <!-- Seção fixa no final da barra lateral -->
+             <div id="button-logout">
+                <button id="logout-button">Sair</button> <!-- Botão de logout -->
+            </div>
+            <div id="chat-list">
+                <!-- Container para os cards -->
+                {% for chat in user_chats %}
+                <div class="chat-card" data-chat-id="{{ chat[0] }}">
+                    <div class="chat-info">
+                        <input type="text" class="chat-name" value="{{ chat[1] }}" disabled>
+                        <div class="chat-actions">
+                            <button class="edit-button"><i class="fas fa-edit"></i></button>
+                            <button class="share-button"><i class="fas fa-share"></i></button>
+                            <button class="delete-button"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        
+           
+        </aside>
+        <div id="sidebar-toggle-button">
+            <i id="sidebar-toggle-icon" class="fa-solid fa-chevron-right"></i>
+        </div>
+        <h3 id="title">Gerencia TI</h3>
+        <div id="background">
+            <img src="static\imagens\Logo.png" alt="background" width="200px" />
+        </div>
+        <div id="message-container">
+            <!-- As mensagens serão adicionadas aqui -->
+        </div>
+        <div id="file-preview" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 9999; background-color: rgba(50, 50, 50, 0.9); color: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);">
+            <img src="static/imagens/reload.gif" alt="Carregando..." style="width: 50px; height: 50px;">
+            <p style="font-size: 16px; margin-top: 10px;">Processando arquivo... Por favor, aguarde.</p>
+        </div>
+        <div id="message-form">
+            <input type="file" id="chat-input" name="file" accept=".pdf, .doc, .docx, .csv, .txt" style="display: none;">
+            <input type="file" id="file-input" name="file" style="display: none;">
+            <input type="file" id="project-input" name="file" webkitdirectory multiple style="display: none;">
+            <div id="menu" class="menu">
+                <a href="#" id="option1">Documentos</a>
+                <a href="#" id="option2">Códigos</a>
+                <a href="#" id="option3">Projeto</a>
+                <a href="#" id="option4">Link GitHub</a>
+            </div>
+            <span id="file-span" class="fa-solid fa-paperclip"
+            style="background-color:#1877F2;color:#fff;border:none;padding:10px 20px;border-radius:5px;font-size:1em;cursor:pointer;"></span>
+            
+
+            <div class="message-wrapper">
+                <textarea id="message" rows="1" placeholder="Enviar Mensagem" maxlength="4000"></textarea>
+                <button class="send-button"
+                    style="background-color:#1877F2;color:#fff;border:none;padding:10px 20px;border-radius:5px;font-size:1em;cursor:pointer;"
+                    onclick="sendUserMessage()">
+                    <i class="fa fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </main>
+    <style>
+        #project-button {
+            position: fixed;
+            top: 100px;
+            right: 10px;
+            z-index: 9999;
+        }
+    </style>
+    <button id="project-button" onclick="openProjectPage()">Escolher Projeto</button>
+
+    <script>
+        function openProjectPage() {
+            window.open('projetos', 'Escolher Projeto', 'width=800,height=600');
+        }
+
+        function receiveMessage(event) {
+            if (event.origin !== window.location.origin) {
+                return;
+            }
+            const selectedDirectory = event.data;
+            document.getElementById('selected-directory').textContent = selectedDirectory;
+        }
+
+        window.addEventListener('message', receiveMessage, false);
+    </script>
+
+    <p  id="project-button" style="color: rgb(255, 255, 255);">Diretório selecionado: <span id="selected-directory" style="color: rgba(255,255,255,255);"></span></p>
+    <script src="static/scripts/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</body>
+
+</html>

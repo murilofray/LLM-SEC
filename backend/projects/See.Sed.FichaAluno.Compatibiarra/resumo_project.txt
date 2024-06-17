@@ -1,0 +1,609 @@
+Diretórios e arquivos encontrados:
+
+Pasta: principal
+  - backend\projects\See.Sed.FichaAluno.Compatibiarra\packages.config
+  - backend\projects\See.Sed.FichaAluno.Compatibiarra\Program.cs
+  - backend\projects\See.Sed.FichaAluno.Compatibiarra\See.Sed.FichaAluno.Compatibiarra.csproj
+  - backend\projects\See.Sed.FichaAluno.Compatibiarra\See.Sed.FichaAluno.Compatibiarra.sln
+
+Pasta: Models
+  - backend\projects\See.Sed.FichaAluno.Compatibiarra\Models\Aluno.cs
+  - backend\projects\See.Sed.FichaAluno.Compatibiarra\Models\DictionaryRankeado.cs
+  - backend\projects\See.Sed.FichaAluno.Compatibiarra\Models\Email.cs
+  - backend\projects\See.Sed.FichaAluno.Compatibiarra\Models\GradeDeObjetos.cs
+  - backend\projects\See.Sed.FichaAluno.Compatibiarra\Models\Motivo.cs
+  - backend\projects\See.Sed.FichaAluno.Compatibiarra\Models\ObjetoGeocodificado.cs
+  - backend\projects\See.Sed.FichaAluno.Compatibiarra\Models\Ordem.cs
+  - backend\projects\See.Sed.FichaAluno.Compatibiarra\Models\TipoEnsinoSerie.cs
+  - backend\projects\See.Sed.FichaAluno.Compatibiarra\Models\Turno.cs
+  - backend\projects\See.Sed.FichaAluno.Compatibiarra\Models\Unidade.cs
+  - backend\projects\See.Sed.FichaAluno.Compatibiarra\Models\Vagas.cs
+
+Pasta: Properties
+  - backend\projects\See.Sed.FichaAluno.Compatibiarra\Properties\AssemblyInfo.cs
+
+Pasta: SQL
+  - backend\projects\See.Sed.FichaAluno.Compatibiarra\SQL\Compatibilizacao.sql
+  - backend\projects\See.Sed.FichaAluno.Compatibiarra\SQL\Query.cs
+
+Pasta: Template
+  - backend\projects\See.Sed.FichaAluno.Compatibiarra\Template\Email.html
+
+Pasta: Util
+  - backend\projects\See.Sed.FichaAluno.Compatibiarra\Util\Mail.cs
+
+
+### Resumo do Arquivo: packages.config
+
+#### Propósito:
+O arquivo `packages.config` é utilizado para gerenciar as dependências de pacotes NuGet em um projeto .NET. Ele especifica quais pacotes e versões são necessários, permitindo que o ambiente de desenvolvimento e execução tenha todas as bibliotecas necessárias instaladas corretamente.
+
+#### Funções:
+- Listar pacotes NuGet necessários para o projeto.
+- Especificar as versões dos pacotes para garantir a compatibilidade e estabilidade do projeto.
+- Facilitar a restauração de pacotes em diferentes ambientes de desenvolvimento e produção.
+
+#### Processos e Lógica:
+O arquivo `packages.config` segue uma estrutura XML simples onde cada pacote é definido por um elemento `<package>`. Cada elemento `<package>` contém atributos que especificam:
+- `id`: O identificador único do pacote NuGet.
+- `version`: A versão específica do pacote que deve ser usada.
+- `targetFramework`: O framework .NET para o qual o pacote é destinado.
+
+Quando o projeto é construído ou restaurado, o gerenciador de pacotes NuGet lê este arquivo para baixar e instalar as versões corretas dos pacotes especificados. Isso garante que todas as dependências estejam presentes e corretas para o funcionamento do projeto.
+
+#### Dependências:
+O arquivo `packages.config` lista as seguintes dependências externas necessárias para o correto funcionamento do projeto:
+
+- **Newtonsoft.Json**:
+  - **Versão**: 8.0.1
+  - **Framework Alvo**: net452
+  - **Descrição**: Biblioteca popular para manipulação de JSON em .NET, usada para serialização e desserialização de objetos JSON.
+
+- **Prodesp.DataAccess**:
+  - **Versão**: 1.0.4.16
+  - **Framework Alvo**: net48
+  - **Descrição**: Biblioteca específica para acesso a dados, presumivelmente utilizada para interações com bases de dados.
+
+- **See.Sed.GeoApi**:
+  - **Versão**: 1.0.1.3
+  - **Framework Alvo**: net48
+  - **Descrição**: Biblioteca para acesso a APIs geográficas, possivelmente usada para funcionalidades relacionadas a geolocalização.
+
+### Conclusão:
+O arquivo `packages.config` é crucial para a gestão de dependências em projetos .NET, assegurando que todas as bibliotecas necessárias estejam disponíveis e nas versões corretas. Ele facilita a manutenção e a replicação do ambiente de desenvolvimento, garantindo consistência entre diferentes instalações do projeto.
+-----------------------------------------------------------------------------------
+'''
+Propósito:
+O arquivo `Program.cs` tem como objetivo principal realizar a compatibilização de alunos nas vagas disponíveis nas escolas do sistema educacional. Ele é responsável por alocar alunos em unidades educacionais, gerenciar a transferência de dados entre sistemas, e realizar a comunicação via email com os responsáveis pelos alunos.
+
+Funções:
+- `Main`: Ponto de entrada do programa que inicializa o processo de compatibilização.
+- `CompatibilizacaoAutomatica`: Executa a compatibilização de forma automática.
+- `CarregarUnidadesEAlunos`: Carrega as unidades e alunos do banco de dados ou de arquivos.
+- `AlocarAlunos`: Aloca alunos nas unidades educacionais de acordo com as regras de negócio.
+- `TransferenciaRPP`: Gerencia a transferência de registros de alunos entre sistemas.
+- `TransferenciaNotas`: Realiza a transferência de notas dos alunos.
+- `LogFichasForaDoParametro`: Loga fichas de alunos que estão fora dos parâmetros da compatibilização.
+- `CarregarAlunoEscolaDistancia`: Carrega a lista de alunos e suas respectivas distâncias das escolas.
+- `DisparoEmail`: Envia emails de notificação aos responsáveis pelos alunos.
+
+Processos e Lógica:
+1. **Inicialização e Verificação**:
+   - O programa inicia verificando se há algum processo de cálculo de rotas em execução, aguardando até que estejam finalizados.
+   
+2. **Carregamento de Dados**:
+   - O método `CarregarUnidadesEAlunos` é utilizado para carregar as unidades e alunos a partir do banco de dados ou de arquivos locais. Este método também carrega dados de irmãos e vagas municipais.
+
+3. **Compatibilização de Alunos**:
+   - O método `AlocarAlunos` é responsável por alocar alunos nas unidades educacionais. Ele segue uma ordem específica de prioridades, incluindo continuidade, definição de deficientes, inscrição de deficientes, definição regular, e inscrição regular.
+   - Durante a alocação, o método considera diversos fatores como a proximidade da unidade, vagas disponíveis, e preferências dos alunos.
+
+4. **Transferência de Dados**:
+   - Métodos como `TransferenciaRPP` e `TransferenciaNotas` gerenciam a transferência de registros de alunos e notas entre sistemas. Esses métodos garantem que os dados estejam atualizados e corretos após a compatibilização.
+
+5. **Log e Notificação**:
+   - O programa mantém um log detalhado de todas as operações realizadas, facilitando a auditoria e resolução de problemas.
+   - O método `DisparoEmail` envia notificações por email aos responsáveis pelos alunos, informando sobre a alocação e outras informações relevantes.
+
+Dependências:
+- `Prodesp.DataAccess`: Utilizado para acesso ao banco de dados.
+- `See.Sed.FichaAluno.Compatibiarra.Models`: Modelos de dados utilizados no processo de compatibilização.
+- `See.Sed.FichaAluno.Compatibiarra.SQL`: Contém as queries SQL utilizadas pelo programa.
+- `System`, `System.Collections.Generic`, `System.Configuration`, `System.Data`, `System.Diagnostics`, `System.IO`, `System.Linq`, `System.Text`: Bibliotecas padrão do .NET utilizadas para manipulação de dados, configuração, e operações de I/O.
+- `System.Text.RegularExpressions`: Utilizado para validação de emails.
+- `Util.Mail`: Biblioteca auxiliar para envio de emails.
+
+O arquivo `Program.cs` é uma peça central no sistema de compatibilização de alunos, integrando diversos componentes e processos para garantir que os alunos sejam alocados nas unidades educacionais de forma eficiente e conforme as regras de negócio estabelecidas.
+```
+-----------------------------------------------------------------------------------
+### Resumo do Arquivo: `Project.csproj`
+
+#### Propósito:
+O arquivo `Project.csproj` é um arquivo de configuração de projeto para o MSBuild utilizado em projetos .NET. Ele define as propriedades, configurações de build, dependências e outros aspectos necessários para compilar e construir o projeto `See.Sed.FichaAluno.Compatibiarra`.
+
+#### Funções:
+- **Configuração de Propriedades do Projeto**: Define propriedades essenciais como `OutputType`, `RootNamespace`, `AssemblyName` e `TargetFrameworkVersion`.
+- **Configuração de Build**: Especifica diferentes configurações de build, como `Debug` e `Release`, incluindo propriedades específicas para cada configuração.
+- **Gerenciamento de Dependências**: Lista as referências a assemblies externos e internos necessários para o projeto.
+- **Instruções de Compilação**: Define quais arquivos devem ser compilados e incluídos no projeto.
+- **Configurações de Conteúdo**: Especifica arquivos adicionais que devem ser incluídos no output do build, como arquivos de configuração e templates de email.
+
+#### Processos e Lógica:
+- **Importação de Propriedades Comuns**: O arquivo importa `Microsoft.Common.props` para incluir propriedades comuns do MSBuild, se o arquivo existir.
+- **Definição de Propriedades Globais**: Propriedades globais como `Configuration`, `Platform`, `ProjectGuid`, `OutputType`, entre outras, são definidas no início do arquivo.
+- **Configurações Específicas de Build**: Propriedades específicas para configurações `Debug` e `Release` são definidas em `PropertyGroup` com condições baseadas na configuração e plataforma.
+- **Referências a Assemblies**: O arquivo lista todas as referências a assemblies externos necessários para o projeto, incluindo caminhos para os arquivos `.dll`.
+- **Inclusão de Arquivos para Compilação**: Arquivos de código-fonte (`.cs`) e outros recursos são incluídos no projeto através de diferentes `ItemGroup`.
+- **Configuração de Conteúdo**: Arquivos não compiláveis, como `App.config` e templates de email, são incluídos no output do build.
+- **Importação de Targets**: O arquivo importa `Microsoft.CSharp.targets` para definir tarefas específicas de compilação para projetos C#.
+
+#### Dependências:
+- **Assemblies Externos**:
+  - `Newtonsoft.Json` (para manipulação de JSON)
+  - `Prodesp.DataAccess` (para acesso a dados)
+  - `See.Sed.GeoApi` (para funcionalidades de geocodificação)
+- **Bibliotecas do .NET Framework**:
+  - `System`
+  - `System.Configuration`
+  - `System.Core`
+  - `System.Xml.Linq`
+  - `System.Data.DataSetExtensions`
+  - `Microsoft.CSharp`
+  - `System.Data`
+  - `System.Net.Http`
+  - `System.Xml`
+- **Arquivos de Código-Fonte Internos**:
+  - Modelos (`Models\*.cs`)
+  - Program (`Program.cs`)
+  - Propriedades (`Properties\AssemblyInfo.cs`)
+  - Consultas SQL (`SQL\Query.cs`)
+  - Utilidades (`Util\Mail.cs`)
+- **Arquivos de Conteúdo**:
+  - Arquivo de configuração (`App.config`)
+  - Configuração de pacotes (`packages.config`)
+  - Templates de email (`Template\Email.html`)
+
+Este resumo fornece uma visão detalhada do arquivo `Project.csproj`, facilitando a compreensão de suas funcionalidades, processos e dependências dentro do projeto.
+-----------------------------------------------------------------------------------
+```
+Propósito:
+O arquivo `Microsoft Visual Studio Solution File, Format Version 12.00` tem como objetivo principal definir a estrutura e as configurações da solução do projeto no ambiente de desenvolvimento do Visual Studio. Ele organiza os projetos que compõem a solução e especifica as configurações de build e plataformas de destino.
+
+Funções:
+- Organização de Projetos: Define e organiza os projetos que fazem parte da solução.
+- Configurações de Build: Especifica as configurações de build (Debug e Release) e as plataformas de destino (x64).
+- Propriedades da Solução: Define propriedades gerais da solução, como a visibilidade do nó da solução.
+
+Processos e Lógica:
+Este arquivo utiliza uma estrutura hierárquica para organizar a solução. Ele começa com a definição da versão do formato do arquivo e da versão do Visual Studio utilizada. Em seguida, lista os projetos incluídos na solução, especificando o nome do projeto, caminho do arquivo do projeto e um identificador único. As seções globais definem as configurações de build e plataformas de destino para cada projeto, permitindo que o Visual Studio configure corretamente o ambiente de desenvolvimento conforme necessário.
+
+Dependências:
+- Visual Studio: O arquivo depende do Visual Studio para ser interpretado e utilizado. Especificamente, ele menciona a versão 14.0.25420.1 do Visual Studio e uma versão mínima de 10.0.40219.1.
+- Arquivos de Projeto (`.csproj`): Cada projeto listado no arquivo de solução faz referência a um arquivo de projeto específico, como `See.Sed.FichaAluno.Compatibiarra.csproj`, que contém configurações detalhadas do projeto individual.
+
+```
+-----------------------------------------------------------------------------------
+## Resumo do Arquivo `Aluno.cs`
+
+### Propósito
+O arquivo `Aluno.cs` é parte do sistema de alocação de alunos na rede de ensino. Ele define a classe `Aluno`, que representa um aluno no contexto do sistema de compatibilização de alunos com as unidades escolares. Este arquivo é essencial para o gerenciamento de dados dos alunos, suas preferências, características e o processo de alocação nas unidades escolares compatíveis.
+
+### Funções
+- **Classe `Aluno`**: Representa um aluno e contém todos os atributos necessários para a compatibilização e alocação.
+- **Classe interna `Irmao`**: Representa a relação entre irmãos, facilitando a alocação conjunta.
+- **Classe interna `UnidadeCompatibilizada`**: Representa uma unidade escolar compatível com o aluno, contendo informações sobre a distância e outras características relevantes.
+
+### Processos e Lógica
+1. **Definição de Constantes**: Define diversos limites e parâmetros utilizados no processo de alocação, como limites de distância para diferentes tipos de alocação.
+2. **Construtores**: Existem construtores para criar instâncias de `Aluno` com base em diferentes cenários (continuidade, definição/inscrição, etc.).
+3. **Métodos de Serialização e Deserialização**: Métodos para serializar e deserializar objetos `Aluno` e `UnidadeCompatibilizada`, permitindo a persistência e recuperação de dados.
+4. **Alocação de Alunos**: Métodos que tentam alocar o aluno em unidades compatíveis, considerando preferências, acessibilidade, distância e disponibilidade de vagas.
+5. **Compatibilização de Irmãos**: Métodos específicos para tentar alocar irmãos juntos, considerando a proximidade e as preferências de cada um.
+6. **Exportação de Dados**: Métodos para exportar dados de alunos e suas alocações em diferentes formatos, facilitando a integração com outros sistemas e a geração de relatórios.
+
+### Dependências
+- **Namespaces Utilizados**:
+  - `See.Sed.GeoApi.Models`: Importado para acesso a funcionalidades de geocodificação e cálculo de rotas.
+  - `System`: Utilizado para tipos básicos e funcionalidades de sistema.
+  - `System.Collections.Generic`: Para manipulação de coleções genéricas.
+  - `System.Data`: Para manipulação de dados e integração com bancos de dados.
+  - `System.Text`: Para manipulação de strings e construção de textos.
+  - `System.Threading`: Para funcionalidades de threading e controle de execução.
+
+### Foco na Compreensão
+Este arquivo é crucial para o sistema de compatibilização de alunos, pois implementa a lógica central que determina como os alunos são alocados nas unidades escolares. A lógica de alocação considera múltiplos fatores, como preferências dos alunos, acessibilidade das unidades, proximidade geográfica e disponibilidade de vagas. Além disso, o arquivo contém mecanismos para tratar casos especiais, como alunos com deficiência e alocação de irmãos juntos, garantindo uma alocação justa e eficiente.
+-----------------------------------------------------------------------------------
+```
+Propósito:
+O arquivo `DictionaryRankeado.cs` tem como objetivo principal fornecer uma implementação de um dicionário ranqueado, que permite armazenar e manipular pares chave-valor com uma ordenação baseada em ranks. Este dicionário é útil em situações onde é necessário não apenas armazenar dados, mas também acessar e manipular esses dados de acordo com uma classificação específica.
+
+Funções:
+- `Adicionar`: Adiciona um novo item ao dicionário ranqueado ou atualiza o valor de um item existente.
+- `Remover`: Remove um item do dicionário baseado na chave fornecida.
+- `Limpar`: Limpa todos os itens do dicionário.
+- `Ordenar`: Ordena os itens no dicionário de acordo com uma comparação fornecida.
+- `Contem`: Verifica se uma chave está presente no dicionário.
+- `RankDaChave`: Retorna o rank associado a uma chave específica.
+- `ValorDaChave`: Retorna o valor associado a uma chave específica.
+- `ValorDaChave(out)`: Tenta obter o valor associado a uma chave específica, retornando um booleano que indica sucesso ou falha.
+- `ChaveDoRank`: Retorna a chave associada a um rank específico.
+- `ValorDoRank`: Retorna o valor associado a um rank específico.
+- `Quantidade`: Propriedade que retorna a quantidade de itens no dicionário.
+- `CopiarDe`: Copia os elementos de outro `DictionaryRankeado` para o atual.
+- `GetEnumerator`: Retorna um enumerador que itera através dos valores do dicionário.
+
+Processos e Lógica:
+O `DictionaryRankeado` utiliza duas estruturas principais: uma lista (`List<ItemRankeado>`) para manter a ordem dos itens e um dicionário (`Dictionary<K, ItemRankeado>`) para acesso rápido aos itens por chave. Cada item é representado por uma instância da classe `ItemRankeado`, que contém a chave, o valor e o rank do item.
+
+- Adicionar: Quando um novo item é adicionado, ele é inserido na lista e no dicionário. Se a chave já existir, o valor é atualizado.
+- Remover: Remove o item da lista e do dicionário, ajustando os ranks dos itens restantes.
+- Ordenar: Ordena a lista de itens com base em uma comparação fornecida e atualiza os ranks dos itens.
+- CopiarDe: Clona os itens de outro `DictionaryRankeado`, preservando a ordem e os ranks.
+
+Dependências:
+- `System`: Necessário para o uso de tipos básicos e interfaces como `IEnumerable` e `IEnumerator`.
+- `System.Collections.Generic`: Necessário para o uso de coleções genéricas como `List` e `Dictionary`.
+
+Este arquivo não depende de outras partes específicas do projeto, mas utiliza funcionalidades básicas do .NET Framework para manipulação de coleções e iteração.
+```
+-----------------------------------------------------------------------------------
+```
+Propósito:
+O arquivo `Email.cs` dentro do namespace `See.Sed.FichaAluno.Compatibiarra.Models` tem como objetivo principal definir um modelo de dados para armazenar e manipular informações de contato relacionadas a alunos e suas escolas no sistema.
+
+Funções:
+- `Email`: Construtor da classe que inicializa as propriedades com os valores fornecidos.
+- `RA`: Propriedade calculada que concatena o RA, dígito do RA e UF do RA em um formato específico.
+
+Processos e Lógica:
+Este arquivo define uma classe `Email` que encapsula informações de contato tanto dos alunos quanto das escolas. A lógica principal reside na propriedade `RA`, que gera um código formatado combinando o RA, o dígito do RA e a UF do RA, utilizando a função `string.Concat` e verificando se o dígito do RA não é nulo ou vazio para decidir se deve incluir um hífen na concatenação. O construtor da classe `Email` é responsável por inicializar todas as propriedades da classe com os valores passados como parâmetros.
+
+Dependências:
+- O arquivo não apresenta dependências externas explícitas, além das bibliotecas padrão do .NET para manipulação de strings e definição de propriedades e métodos.
+```
+
+Este resumo fornece uma visão clara e concisa do propósito, das funções, dos processos e da lógica, além das dependências do arquivo `Email.cs`. Isso deve ajudar na compreensão do funcionamento do arquivo e de como ele se integra com outros componentes do projeto.
+-----------------------------------------------------------------------------------
+```
+Propósito:
+O arquivo `GradeDeObjetos.cs` tem como objetivo principal gerenciar uma grade de objetos geocodificados, facilitando a organização e a consulta de objetos com base em suas coordenadas geográficas.
+
+Funções:
+- `GradeDeObjetos`: Construtor que inicializa a grade com objetos geocodificados e define os limites geográficos.
+- `Adicionar(T objeto)`: Adiciona um objeto na célula correspondente da grade.
+- `Adicionar(IEnumerable<T> objetos)`: Adiciona múltiplos objetos na grade.
+- `Remover(T objeto)`: Remove um objeto da célula correspondente da grade.
+- `Limpar()`: Limpa todas as células da grade.
+- `Vizinhos(ObjetoGeocodificado objeto, int nivel)`: Retorna uma lista de objetos vizinhos a um objeto dado, com base no nível especificado.
+- `Vizinhos(Coordenada coordenada, int nivel)`: Retorna uma lista de objetos vizinhos a uma coordenada dada, com base no nível especificado.
+- `CelulaDaCoordenada(Coordenada coordenada, out int linha, out int coluna)`: Determina a célula da grade correspondente a uma coordenada específica.
+
+Processos e Lógica:
+O arquivo utiliza uma abordagem baseada em grade para organizar objetos geocodificados. A grade é criada com base nas coordenadas mínimas e máximas dos objetos iniciais e é dividida em células de acordo com os comprimentos de latitude e longitude especificados. Cada célula da grade contém uma lista de objetos que pertencem àquela região geográfica.
+
+1. **Inicialização**:
+   - Calcula as coordenadas mínimas e máximas dos objetos iniciais.
+   - Define a quantidade de células na grade com base nos comprimentos de latitude e longitude fornecidos.
+   - Distribui os objetos iniciais nas células correspondentes.
+
+2. **Adição de Objetos**:
+   - Determina a célula correspondente à coordenada do objeto.
+   - Adiciona o objeto à lista da célula.
+
+3. **Remoção de Objetos**:
+   - Determina a célula correspondente à coordenada do objeto.
+   - Remove o objeto da lista da célula.
+
+4. **Consulta de Vizinhos**:
+   - Determina a célula correspondente à coordenada do objeto.
+   - Coleta objetos das células vizinhas com base no nível especificado.
+
+Dependências:
+- `See.Sed.GeoApi.Models`: Importado para acesso à classe `ObjetoGeocodificado` e suas propriedades.
+- `System`: Utilizado para funcionalidades básicas do .NET Framework.
+- `System.Collections.Generic`: Utilizado para manipulação de coleções genéricas como `List<T>`.
+```
+
+Este resumo fornece uma visão clara e concisa do propósito, funções, processos, lógica e dependências do arquivo `GradeDeObjetos.cs`, facilitando a compreensão e análise do seu funcionamento dentro do projeto.
+-----------------------------------------------------------------------------------
+## Resumo Detalhado do Arquivo `namespace See.Sed.FichaAluno.Compatibiarra.Models`
+
+### Propósito:
+O arquivo `namespace See.Sed.FichaAluno.Compatibiarra.Models` define uma enumeração chamada `Motivo`, que é utilizada para categorizar diferentes razões ou motivos dentro do sistema de compatibilização de alunos. Este arquivo é essencial para a definição de constantes que representam diversos estados e condições que podem ocorrer durante o processo de compatibilização.
+
+### Funções:
+- **Enumeração `Motivo`**: Define uma lista de valores inteiros associados a diferentes motivos que podem ser utilizados para categorizar situações específicas no contexto de compatibilização de alunos. Cada valor inteiro é mapeado para uma descrição textual que representa a razão específica.
+
+### Processos e Lógica:
+- **Enumeração**: A enumeração `Motivo` é utilizada para representar de forma clara e organizada as diversas razões que podem surgir durante o processo de compatibilização de alunos. Cada item na enumeração possui um valor inteiro único, facilitando a manipulação e a comparação dos motivos dentro do código.
+- **Motivos Específicos**: A enumeração cobre uma ampla gama de situações, desde a falta de georreferenciamento ou ficha (`SemGeoOuSemFicha`), passando por questões de continuidade (`Continuidade`, `DefinicaoContinuidade`), inscrições (`Inscricao`, `InscricaoIntegral`), até problemas específicos como falta de vagas (`SemVagasNaUnidadeDeContinuidade`, `SemVagasCEU`).
+
+### Dependências:
+- **Dependências Externas**: Este arquivo não possui dependências externas diretas, uma vez que define apenas uma enumeração. No entanto, pode ser utilizado em conjunto com outras partes do sistema que lidam com a lógica de compatibilização de alunos.
+- **Namespace**: Está localizado dentro do namespace `See.Sed.FichaAluno.Compatibiarra.Models`, sugerindo que faz parte de um módulo maior relacionado à compatibilização de alunos.
+
+### Conclusão:
+Este arquivo é fundamental para a categorização de razões no sistema de compatibilização de alunos, proporcionando uma maneira organizada e padronizada de lidar com diferentes situações que podem ocorrer durante o processo. A enumeração `Motivo` facilita a manutenção e a legibilidade do código, permitindo que desenvolvedores identifiquem rapidamente as condições específicas que estão sendo tratadas.
+-----------------------------------------------------------------------------------
+```
+Propósito:
+O arquivo `ObjetoGeocodificado.cs` tem como objetivo principal definir uma classe abstrata que representa um objeto geocodificado, contendo uma coordenada geográfica e verificando a validade dessa coordenada.
+
+Funções:
+- `ObjetoGeocodificado(Coordenada coordenada)`: Construtor que inicializa a instância da classe com uma coordenada e valida se esta coordenada é válida.
+- `ToString()`: Sobrescreve o método `ToString` para retornar a representação em string da coordenada.
+- `DistanciaGeodesica(ObjetoGeocodificado destino)`: Calcula a distância geodésica entre a coordenada do objeto atual e a coordenada de outro objeto geocodificado.
+
+Processos e Lógica:
+O arquivo utiliza uma abordagem de inicialização e validação de coordenadas geográficas. O construtor da classe `ObjetoGeocodificado` recebe uma instância de `Coordenada`, verifica se os valores de latitude e longitude são válidos (não infinitos e não NaN), e define a propriedade `CoordenadaValida` com base nessa verificação. A lógica de cálculo da distância geodésica é delegada ao método `DistanciaGeodesica` da classe `Coordenada`.
+
+Dependências:
+- `See.Sed.GeoApi.Models`: Importado para acesso à classe `Coordenada`, que é utilizada para representar as coordenadas geográficas e calcular a distância geodésica.
+```
+
+Este resumo fornece uma visão clara e concisa do propósito, funções, processos, lógica e dependências do arquivo `ObjetoGeocodificado.cs`, facilitando a compreensão de suas funcionalidades e integrações com outros componentes do projeto.
+-----------------------------------------------------------------------------------
+Propósito:
+O arquivo `Ordem.cs` tem como objetivo principal definir a estrutura de dados para representar uma Ordem no contexto do sistema de gerenciamento de fichas de alunos. Este arquivo faz parte do namespace `See.Sed.FichaAluno.Compatibiarra.Models`.
+
+Funções:
+- Este arquivo não contém funções ou métodos; ele é uma classe de modelo que define propriedades para armazenar informações sobre uma Ordem.
+
+Processos e Lógica:
+- A classe `Ordem` é utilizada para encapsular dados relacionados a uma ordem específica, incluindo informações sobre a distância, códigos de aluno, escola, unidade, motivo da ordem, continuidade e endereço do aluno.
+- Cada propriedade da classe `Ordem` representa um atributo específico da ordem, permitindo que os dados sejam facilmente acessados e manipulados por outras partes do sistema.
+- A lógica subjacente envolve a utilização desta classe como um contêiner de dados, facilitando a transferência e manipulação de informações entre diferentes componentes do sistema.
+
+Dependências:
+- Este arquivo não possui dependências explícitas de outros arquivos ou bibliotecas externas.
+- No entanto, a classe `Ordem` pode ser utilizada em conjunto com outras classes e métodos dentro do namespace `See.Sed.FichaAluno.Compatibiarra.Models` e possivelmente em outras partes do projeto que lidem com a gestão de ordens.
+
+Resumo:
+O arquivo `Ordem.cs` define uma classe de modelo essencial para o gerenciamento de ordens relacionadas a alunos dentro do sistema. Ele encapsula diversos atributos importantes, como ID, distância, códigos de aluno, escola e unidade, motivo, continuidade e endereço do aluno, permitindo que esses dados sejam estruturados e manipulados de forma eficiente.
+-----------------------------------------------------------------------------------
+```
+Propósito:
+O arquivo `TipoEnsinoSerie.cs` tem como objetivo principal gerenciar a equivalência entre diferentes tipos de ensino e suas respectivas séries dentro do sistema See.Sed.
+
+Funções:
+- `CarregarEquivalentes`: Carrega as equivalências de tipos de ensino e séries a partir do banco de dados e armazena em um dicionário.
+- `Gerar`: Gera um valor inteiro único combinando o tipo de ensino e a série, usando operações bitwise.
+- `GerarEquivalente`: Calcula e retorna o tipo de ensino e série equivalente, se existir, caso contrário, retorna o valor original.
+- `TipoEnsino`: Extrai o tipo de ensino a partir do valor combinado.
+- `Serie`: Extrai a série a partir do valor combinado.
+
+Processos e Lógica:
+Este arquivo utiliza um dicionário para armazenar as equivalências de tipos de ensino e séries. A função `CarregarEquivalentes` conecta-se ao banco de dados, executa uma consulta para obter as equivalências e armazena os resultados em um dicionário. As funções `Gerar`, `TipoEnsino` e `Serie` utilizam operações bitwise para combinar e separar os valores de tipo de ensino e série de forma eficiente. A função `GerarEquivalente` verifica se existe uma equivalência para o tipo de ensino e série fornecidos e retorna a equivalência ou o valor original.
+
+Dependências:
+- `Prodesp.DataAccess`: Utilizada para criar e manipular a conexão com o banco de dados.
+- `System.Collections.Generic`: Utilizada para a estrutura de dados `Dictionary`.
+- `System.Runtime.CompilerServices`: Utilizada para otimizar o desempenho das funções com `MethodImplOptions.AggressiveInlining`.
+- `IDataBase`: Interface para operações de banco de dados.
+- `FactoryDataBase`: Fábrica para criar instâncias de `IDataBase`.
+- `SedDataReader`: Classe para leitura de dados retornados pelo banco de dados.
+- `Program.ConnectionStringRead`: String de conexão para leitura do banco de dados.
+```
+
+-----------------------------------------------------------------------------------
+```
+Propósito:
+O arquivo `namespace See.Sed.FichaAluno.Compatibiarra.Models` define uma enumeração chamada `Turno` que representa os diferentes períodos de aulas em um sistema de gestão escolar.
+
+Funções:
+- Enumeração `Turno`: Define os diferentes turnos possíveis para as aulas, que são utilizados em outras partes do sistema para categorizar e buscar informações relacionadas aos períodos de aulas.
+
+Processos e Lógica:
+Este arquivo utiliza uma enumeração (`enum`) para listar os diferentes turnos escolares. A enumeração é uma forma eficiente de representar constantes relacionadas, garantindo que os valores sejam únicos e facilmente utilizáveis em outras partes do código. A lógica subjacente é simples: cada turno é mapeado para um valor inteiro específico, facilitando a comparação e a manipulação dos dados em operações de busca e categorização. O valor `Todos` é um caso especial utilizado apenas em buscas e não é armazenado no banco de dados.
+
+Dependências:
+Este arquivo não possui dependências externas explícitas, mas faz parte do namespace `See.Sed.FichaAluno.Compatibiarra.Models`, sugerindo que pode ser utilizado em conjunto com outros arquivos e classes dentro deste namespace para formar a estrutura completa do modelo de dados do sistema de gestão escolar.
+```
+
+Este resumo deve proporcionar uma compreensão clara e concisa do arquivo especificado, permitindo uma análise aprofundada de suas funcionalidades e integrações com outros componentes do projeto.
+-----------------------------------------------------------------------------------
+```markdown
+Propósito:
+O arquivo `Unidade.cs` tem como objetivo principal definir a classe `Unidade` e suas funcionalidades associadas no contexto da aplicação de gerenciamento escolar. Ele inclui a definição de turmas, alocação de alunos, e a gestão de informações relacionadas às unidades escolares.
+
+Funções:
+- Classe `Unidade`: Representa uma unidade escolar, contendo informações sobre a escola e suas turmas.
+- Classe `Turma`: Representa uma turma dentro de uma unidade escolar, contendo informações sobre a turma e métodos para gerenciar a capacidade e alocação de alunos.
+- Métodos de `Unidade`:
+  - `AdicionarTurma`: Adiciona uma nova turma à unidade.
+  - `InicialmenteTemVagasParaTipoEnsinoSerie`: Verifica se a unidade tem vagas para um determinado tipo de ensino e série.
+  - `LimparTiposEnsinoETurmas`: Limpa as listas de tipos de ensino e turmas.
+  - `Serializar`/`Deserializar`: Métodos para serializar e deserializar objetos `Unidade` e `Turma`.
+  - `EqualizarTurmas`: Equaliza a distribuição de alunos entre turmas.
+  - `RelatorioMestre`/`RelatorioTurmas`: Gera relatórios de turmas e alunos.
+  - `DefinirVagasMunicipais`: Define as vagas municipais para tipos de ensino e séries.
+  - `TentarAlocarAlunoDefinicaoInscricao`: Tenta alocar um aluno em uma turma com base em definições e inscrições.
+  - `TentarAlocarAlunoApenasPorVagas`: Tenta alocar um aluno com base apenas nas vagas disponíveis.
+
+Processos e Lógica:
+A lógica do arquivo é centrada na gestão de unidades escolares e suas turmas. O processo principal envolve a criação de turmas, alocação de alunos, e verificação de capacidade. A classe `Unidade` utiliza métodos para adicionar turmas, verificar vagas disponíveis, e alocar alunos de maneira eficiente. A serialização e deserialização permitem a persistência dos dados das unidades e turmas. A equalização de turmas garante uma distribuição equilibrada de alunos entre as turmas.
+
+Dependências:
+- `See.Sed.GeoApi.Models`: Importado para acesso à classe `ObjetoGeocodificado`.
+- `System`: Utilizado para tipos básicos e manipulação de dados.
+- `System.Collections.Generic`: Utilizado para coleções genéricas como `Dictionary` e `List`.
+- `System.Data`: Utilizado para manipulação de dados em tabelas.
+- `System.Text`: Utilizado para manipulação de strings e construção de relatórios.
+```
+-----------------------------------------------------------------------------------
+```
+Propósito:
+O arquivo `Vagas.cs` dentro do namespace `See.Sed.FichaAluno.Compatibiarra.Models` tem como objetivo principal definir um modelo de dados para representar informações sobre vagas escolares. Este modelo é utilizado para armazenar e manipular dados relacionados ao ano letivo, escola, tipo de ensino, série, unidade, turmas, total de vagas e vagas disponíveis.
+
+Funções:
+- Propriedades públicas:
+  - `anoLetivo`: Representa o ano letivo ao qual as vagas se referem.
+  - `codigoEscola`: Armazena o código da escola.
+  - `codigoTipoEnsino`: Guarda o código do tipo de ensino.
+  - `serie`: Indica a série correspondente.
+  - `codigoUnidade`: Contém o código da unidade escolar.
+  - `turmas`: Informa o número de turmas.
+  - `totalVagas`: Indica o total de vagas disponíveis.
+  - `vagasDisponiveis`: Armazena o número de vagas ainda disponíveis.
+
+Processos e Lógica:
+Este arquivo define uma classe simples que serve como um contêiner de dados. A lógica subjacente é a de um modelo de dados (data model) que facilita a transferência e manipulação de informações relacionadas às vagas escolares. Não há métodos complexos ou lógica de negócios implementada diretamente dentro desta classe; ela é utilizada principalmente para armazenar dados de forma estruturada.
+
+Dependências:
+- Não há dependências explícitas listadas no arquivo `Vagas.cs`. Contudo, como parte de um projeto maior, ele pode depender de outros componentes do namespace `See.Sed.FichaAluno.Compatibiarra.Models` e de bibliotecas padrão do .NET para funcionar corretamente.
+```
+
+Este resumo detalhado fornece uma visão clara e concisa do propósito, funções, processos e dependências do arquivo `Vagas.cs`, facilitando a compreensão de seu papel dentro do projeto.
+-----------------------------------------------------------------------------------
+```
+Propósito:
+O arquivo `AssemblyInfo.cs` tem como objetivo principal fornecer informações de configuração e metadata sobre a montagem (assembly) do projeto `See.Sed.FichaAluno.Compatibiarra`. Este arquivo é usado para definir atributos da montagem que são utilizados pelo .NET runtime e ferramentas de desenvolvimento.
+
+Funções:
+- `[assembly: AssemblyTitle("See.Sed.FichaAluno.Compatibiarra")]`: Define o título da montagem.
+- `[assembly: AssemblyDescription("")]`: Fornece uma descrição da montagem.
+- `[assembly: AssemblyConfiguration("")]`: Define a configuração da montagem (ex. Debug ou Release).
+- `[assembly: AssemblyCompany("")]`: Especifica a empresa que desenvolveu a montagem.
+- `[assembly: AssemblyProduct("See.Sed.FichaAluno.Compatibiarra")]`: Define o nome do produto ao qual a montagem pertence.
+- `[assembly: AssemblyCopyright("Copyright ©  2017")]`: Fornece informações de copyright.
+- `[assembly: AssemblyTrademark("")]`: Especifica a marca registrada associada à montagem.
+- `[assembly: AssemblyCulture("")]`: Define a cultura da montagem.
+- `[assembly: ComVisible(false)]`: Define a visibilidade dos tipos na montagem para componentes COM.
+- `[assembly: Guid("3cb2e83f-0bab-499a-a69c-cf72d50bc761")]`: Define o GUID da biblioteca de tipos se a montagem for exposta a COM.
+- `[assembly: AssemblyVersion("1.0.0.0")]`: Define a versão principal da montagem.
+- `[assembly: AssemblyFileVersion("1.0.0.0")]`: Define a versão do arquivo da montagem.
+
+Processos e Lógica:
+Este arquivo utiliza uma série de atributos de montagem para configurar e fornecer informações sobre a montagem. A lógica subjacente é simples e envolve a aplicação de atributos específicos que são interpretados pelo .NET runtime e ferramentas de desenvolvimento para identificar e configurar a montagem de maneira adequada. A visibilidade para componentes COM é definida como falsa, o que significa que os tipos nesta montagem não são visíveis para COM a menos que explicitamente alterado.
+
+Dependências:
+- O arquivo `AssemblyInfo.cs` não possui dependências externas explícitas, mas faz uso de namespaces e classes do .NET Framework, como `System.Reflection`, `System.Runtime.CompilerServices` e `System.Runtime.InteropServices`, para definir os atributos da montagem.
+```
+-----------------------------------------------------------------------------------
+```
+Propósito:
+O objetivo principal do arquivo é criar e organizar várias tabelas no banco de dados `CADALUNOS` que são utilizadas para armazenar informações relacionadas à compatibilização de alunos com escolas e municípios. Essas tabelas são essenciais para gerenciar dados de compatibilização, alocação de alunos, vagas remanescentes, e transferências.
+
+Funções:
+- Criação de tabelas para armazenar dados de compatibilização de municípios (`TB_COMPAT_MUNICIPIO`), compatibilização de alunos com escolas mais próximas (`TB_REL_COMPAT_15`), compatibilização de dados do município CBI (`TB_REL_COMPAT_CBI`), vagas remanescentes do município (`TB_REL_COMPAT_MUN_VAGAS`), e dados gerais de compatibilização (`TB_REL_COMPAT_REAL`).
+- Criação de tabelas para gerenciar exclusões e transferências de alunos (`TB_REL_COMPAT_EXCLUSAO_DESLOCAMENTO` e `TB_REL_COMPAT_TRANSFERENCIA_MOVIMENTACAO`).
+
+Processos e Lógica:
+- `TB_COMPAT_MUNICIPIO`: Armazena informações de compatibilização de municípios, incluindo ano letivo e código DNE.
+- `TB_Compatibiarra`: Contém um único campo booleano para flag de compatibilização.
+- `TB_REL_COMPAT_15`: Armazena as 15 escolas mais próximas de um aluno, com base nas coordenadas geográficas e tipo de ensino.
+- `TB_REL_COMPAT_CBI`: Guarda dados detalhados de alunos e suas respectivas informações de compatibilização com o município CBI.
+- `TB_REL_COMPAT_MUN_VAGAS`: Mantém registros de vagas remanescentes nas escolas do município, categorizadas por tipo de ensino e série.
+- `TB_REL_COMPAT_REAL`: Armazena informações completas de compatibilização, incluindo dados do aluno, escola, e situação de alocação.
+- `TB_REL_COMPAT_EXCLUSAO_DESLOCAMENTO` e `TB_REL_COMPAT_TRANSFERENCIA_MOVIMENTACAO`: Gerenciam dados de exclusões e transferências de alunos, respectivamente.
+
+Dependências:
+- O arquivo depende de um sistema de banco de dados SQL Server para a criação e gerenciamento das tabelas.
+- As tabelas criadas dependem das estruturas de dados definidas, como tipos de dados (INT, VARCHAR, FLOAT, BIT) e constraints (PRIMARY KEY, NONCLUSTERED INDEX).
+- As tabelas podem interagir com outros componentes do sistema que gerenciam dados de alunos, escolas e compatibilizações.
+
+```
+Este resumo detalhado deve fornecer uma visão clara e concisa do propósito, funções, processos, lógica e dependências do arquivo SQL fornecido.
+-----------------------------------------------------------------------------------
+```
+Propósito:
+O arquivo `namespace See.Sed.FichaAluno.Compatibiarra.SQL` tem como objetivo principal definir e gerenciar diversas consultas SQL que são utilizadas no processo de compatibilização de alunos no sistema de gestão escolar.
+
+Funções:
+- `QueryInicioCompatibiarra`: Define a consulta SQL para iniciar o processo de compatibilização de alunos.
+- `QueryFinalizaCompatibiarra`: Define a consulta SQL para finalizar o processo de compatibilização.
+- `QueryPrepararUnidades`: Prepara as unidades escolares que serão utilizadas no processo de compatibilização.
+- `QueryUnidades`: Seleciona as unidades escolares preparadas.
+- `QueryTurmas`: Seleciona as turmas das unidades escolares.
+- `QueryVagasMunicipioSP`: Seleciona as vagas disponíveis nas escolas do município de São Paulo.
+- `QueryAlunosCalculo2`: Traz os dados das fichas de inscrição dos alunos para grandes compatibilizações.
+- `QueryAlunosContinuidadePre`: Prepara as turmas de origem para alunos de continuidade.
+- `QueryAlunosMatriculadosManual`: Seleciona alunos matriculados manualmente.
+- `QueryAlunosContinuidadePos`: Seleciona os alunos com matrículas ativas nas turmas de continuidade.
+- `QueryAlunosRestantesDefinicaoInscricao`: Seleciona os dados das fichas de inscrição restantes.
+- `QueryAlunosRestantesContinuidade`: Seleciona os alunos restantes com matrículas ativas nas turmas de continuidade.
+- `QueryIrmaos`: Seleciona os irmãos dos alunos.
+- `QueryIrmaosSemRodada`: Seleciona os irmãos dos alunos sem rodada de compatibilização.
+- `QueryAtualizaTurmaQtds`: Atualiza as quantidades de alunos nas turmas.
+- `GuardaPosicaoVagas`: Guarda a posição das vagas disponíveis.
+- `QueryLimpeza`: Limpa as tabelas temporárias utilizadas.
+- `QueryAlunoEscolaDistancia`: Seleciona a distância dos alunos até as escolas.
+- `QueryAlunoEscolaDistanciaSemRodadaAPENASAPE`: Seleciona a distância dos alunos até as escolas sem rodada de compatibilização (apenas APE).
+- `QueryAlunoEscolaDistanciaSemRodada`: Seleciona a distância dos alunos até as escolas sem rodada de compatibilização.
+- `QueryAlunosRodadasEtapa1`: Seleciona os alunos para a primeira etapa das rodadas de compatibilização.
+- `QueryAlunosRodadasEtapa2`: Seleciona os alunos para a segunda etapa das rodadas de compatibilização.
+- `QueryTurmasIrmaosRodadas`: Seleciona as turmas dos irmãos dos alunos nas rodadas de compatibilização.
+- `QueryMatInscAnoSeguinte`: Atualiza as matrículas e inscrições dos alunos para o ano seguinte.
+- `QueryConversaoAbandono`: Converte o status de abandono dos alunos.
+- `QueryInativarMatriculaOutrasRedes`: Inativa matrículas ativas em outras redes de ensino.
+- `QueryInativarInteresseRematricula`: Inativa o interesse de rematrícula dos alunos.
+- `QueryAlunosMatriculados`: Seleciona os alunos matriculados para envio de e-mails.
+- `QueryIntegracaoSedMun`: Insere dados na tabela de integração SED-MUN.
+- `QueryLogVagas`: Insere log das vagas disponíveis por escola.
+
+Processos e Lógica:
+Este arquivo utiliza uma abordagem de consulta SQL para realizar diversas operações necessárias no processo de compatibilização de alunos. As consultas são organizadas em diferentes categorias, como preparação de unidades, seleção de turmas, cálculo de vagas, e gerenciamento de matrículas e inscrições. Além disso, há consultas específicas para rodadas de compatibilização e integração com outros sistemas.
+
+Dependências:
+- `Program`: Variáveis e parâmetros definidos no programa principal que são utilizados nas consultas SQL.
+- `DB_SCE.Escola`: Tabelas de escolas, unidades, endereços e municípios.
+- `CADALUNOS`: Tabelas de compatibilização, fichas de inscrição, matrículas de alunos, turmas, e histórico de fluxo de aprovação de turmas.
+- `CALCULO_ROTAS`: Tabelas de rotas e distâncias de alunos até as escolas.
+- `DB_SARA.CADALUNOS`: Tabelas de alunos, matrículas, turmas, e interesse de rematrícula.
+- `DB_SARA.dbo`: Tabelas de exceções de compatibilização.
+- `DB_SCE.Escola.TB_CONTATO_UNIDADE`: Tabelas de contatos de unidades escolares.
+- `DB_SCE.Escola.TB_CONTATO`: Tabelas de contatos.
+- `DB_SARA.CADALUNOS.TB_PARAMETRO`: Tabelas de parâmetros do sistema.
+- `DB_SARA.CADALUNOS.TB_TP_ENSINO_EQUIVALENCIA`: Tabelas de equivalência de tipos de ensino.
+
+Este resumo detalhado visa proporcionar uma compreensão clara e concisa das funcionalidades e integrações do arquivo `namespace See.Sed.FichaAluno.Compatibiarra.SQL` dentro do projeto.
+```
+-----------------------------------------------------------------------------------
+```
+Propósito:
+O arquivo `email_template.html` tem como objetivo principal servir como um modelo de e-mail automatizado para informar aos responsáveis sobre a matrícula de estudantes na rede pública de ensino do Estado de São Paulo.
+
+Funções:
+- Este arquivo HTML é usado para gerar e-mails personalizados com informações específicas sobre a matrícula de um estudante, incluindo seu nome, RA (Registro Acadêmico), escola onde foi matriculado e instruções para acessar o conteúdo educacional online.
+
+Processos e Lógica:
+- O arquivo utiliza placeholders (`{0}`, `{1}`, `{2}`, `{3}`) que são substituídos dinamicamente por informações específicas do estudante e da escola.
+- A estrutura do HTML segue uma lógica sequencial para apresentar as informações de forma clara e organizada.
+- Inclui links para recursos importantes, como o site da Secretaria Escolar Digital e o Centro de Mídias de São Paulo, facilitando o acesso dos estudantes e responsáveis.
+- O e-mail também fornece instruções detalhadas para o primeiro acesso ao aplicativo do Centro de Mídias SP, incluindo o processo de login e senha.
+
+Dependências:
+- Este arquivo HTML depende de um sistema backend que realiza a substituição dos placeholders pelos dados reais dos estudantes.
+- Pode ser necessário um servidor de e-mail ou um serviço de envio de e-mails (como SMTP) para que o e-mail seja enviado aos destinatários.
+- O conteúdo e os links incluídos no e-mail dependem da disponibilidade e manutenção dos sites mencionados (e.g., sed.educacao.sp.gov.br, centrodemidiasp.educacao.sp.gov.br).
+
+```
+-----------------------------------------------------------------------------------
+```markdown
+Propósito:
+O arquivo `Mail.cs` tem como objetivo principal fornecer funcionalidades para o envio de emails dentro do namespace `See.Sed.FichaAluno.Compatibiarra.Util`.
+
+Funções:
+- `EnviarEmailBodyHtmlGmail`: Responsável por enviar emails utilizando o servidor SMTP do Gmail. Trata destinatários principais e cópias (cc).
+- `EnviarEmailBodyHtml2`: Envia emails utilizando um servidor SMTP dinâmico obtido através de um banco de dados. Também trata destinatários principais e cópias (cc).
+- `GetSmtp`: Configura e retorna um objeto `SmtpClient` para envio de emails.
+- `GetNumberServer`: Obtém o número do servidor de email através de uma stored procedure no banco de dados.
+- `EnviarEmail`: Método auxiliar para enviar emails utilizando o servidor SMTP do Gmail.
+
+Processos e Lógica:
+- `EnviarEmailBodyHtmlGmail`: Verifica se os campos de destinatário principal e cópia (cc) estão preenchidos, e então envia emails para cada um dos destinatários. Em caso de erro, a exceção é capturada e uma mensagem é exibida no console.
+- `EnviarEmailBodyHtml2`: Tenta obter o número do servidor de email até três vezes. Configura o cliente SMTP com base no número do servidor e envia o email. Em caso de erro, a exceção é capturada e uma mensagem é exibida no console.
+- `GetSmtp`: Configura o cliente SMTP com as credenciais e o servidor apropriado baseado no número do servidor fornecido.
+- `GetNumberServer`: Executa uma stored procedure no banco de dados para obter o número do servidor de email.
+- `EnviarEmail`: Configura o cliente SMTP com as credenciais do Gmail e envia o email para o destinatário especificado.
+
+Dependências:
+- `System`: Namespace padrão do .NET Framework.
+- `System.Data`: Necessário para manipulação de dados e execução de comandos no banco de dados.
+- `System.Linq`: Utilizado para manipulações de coleções e arrays.
+- `System.Net.Mail`: Necessário para criar e enviar emails.
+- `System.Text`: Utilizado para manipulação de strings e encoding.
+- `Prodesp.DataAccess.IDataBase`: Interface para acesso ao banco de dados, necessária para a execução de comandos e obtenção de parâmetros.
+```
+
+-----------------------------------------------------------------------------------

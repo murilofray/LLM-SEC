@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escolha o Projeto</title>
+    <style>
+        :root {
+            --color-white: #fff;
+            --color-main: #2c2d30;
+        }
+
+        body {
+            background: var(--color-main);
+            display: flex;
+            font-size: 1em;
+            font-family: system-ui, sans-serif;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #directory-content {
+            margin-top: 20px;
+            background-color: var(--color-main);
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 90vw;
+            max-width: 800px;
+        }
+
+        .file-item {
+            margin: 5px 0;
+            color: var(--color-white);
+            background-color: #3d3e45;
+            padding: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #1877f2;
+            color: var(--color-white);
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0e5a9d;
+        }
+
+        .delete-button {
+            background-color: #e72d23;
+        }
+
+        .delete-button:hover {
+            background-color: #cc4125;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="title">Escolha o Projeto</h1>
+    <div id="directory-content"></div>
+
+    <script>
+        async function listDirectory() {
+            try {
+                const response = await fetch('/list-directory');
+                const data = await response.json();
+                const directoryContent = document.getElementById('directory-content');
+                directoryContent.innerHTML = '';  // Clear previous content
+                
+                if (data.error) {
+                    directoryContent.innerHTML = `<p>${data.error}</p>`;
+                } else {
+                    data.files.forEach(file => {
+                        const fileElement = document.createElement('div');
+                        fileElement.className = 'file-item';
+                        fileElement.textContent = file;
+                        
+                        const actionsElement = document.createElement('div');
+                        actionsElement.className = 'file-actions';
+                        
+                        const selectButton = document.createElement('button');
+                        selectButton.textContent = 'Select';
+                        selectButton.onclick = () => selectDirectory(file);
+
+                        const deleteButton = document.createElement('button');
+                        deleteButton.textContent = 'Delete';
+                        deleteButton.className = 'delete-button';
+                        deleteButton.onclick = () => deleteDirectory(file);
+
+                        actionsElement.appendChild(selectButton);
+                        actionsElement.appendChild(deleteButton);
+                        fileElement.appendChild(actionsElement);
+                        directoryContent.appendChild(fileElement);
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching directory content:', error);
+            }
+        }
+
+        async function selectDirectory(directory) {
+            window.opener.postMessage(directory, window.location.origin);
+            window.close();
+        }
+
+        async function deleteDirectory(directory) {
+            try {
+                const response = await fetch(`/delete-directory?directory=${encodeURIComponent(directory)}`, {
+                    method: 'DELETE'
+                });
+                const data = await response.json();
+                if (data.success) {
+                    listDirectory();
+                } else {
+                    console.error('Error deleting directory:', data.error);
+                }
+            } catch (error) {
+                console.error('Error deleting directory:', error);
+            }
+        }
+
+        // Call listDirectory when the page loads
+        document.addEventListener('DOMContentLoaded', listDirectory);
+    </script>
+</body>
+</html>
