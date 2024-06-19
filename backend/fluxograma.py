@@ -4,48 +4,66 @@ def processar_resposta(resposta_llm):
     conexoes = []
     tipo = None
 
-    for linha in resposta_llm.split('\n'):
-        if 'Começo Nós' in linha:
+    # Dividindo a resposta em linhas
+    linhas = resposta_llm.strip().split('\n')
+
+    # Iterando pelas linhas
+    i = 0
+    while i < len(linhas):
+        linha = linhas[i].strip()
+        
+        # Verifica o tipo de seção (nós ou conexões)
+        if linha.startswith('Começo Nós'):
             tipo = 'no'
-        elif 'Fim Nós' in linha:
-            tipo = None
-        elif 'Começo Conexões' in linha:
+        elif linha.startswith('Começo Conexões'):
             tipo = 'conexao'
-        elif 'Fim Conexões' in linha:
+        elif linha.startswith('Fim Nós') or linha.startswith('Fim Conexões'):
             tipo = None
-        elif tipo == 'no' and linha.strip() != '':
-            partes = linha.strip().split()
-            if len(partes) > 1:
-                no_id = partes[-1][1:-1]  # extrai o ID do nó entre parênteses
-                descricao = ' '.join(partes[:-1])
-            else:
-                no_id = None
-                descricao = partes[0]
-            nos.append((no_id, descricao))
-        elif tipo == 'conexao' and linha.strip() != '':
-            partes = linha.strip().split()
-            if len(partes) > 2:
-                origem = partes[0]
-                destino = partes[2]
-                if '[' in linha and ']' in linha:
-                    condicao = linha[linha.find('[') + 1:linha.find(']')]
-                else:
-                    condicao = None
-                conexoes.append((origem, destino, condicao))
-            elif len(partes) == 2:
-                origem = partes[0]
-                destino = partes[1]
-                conexoes.append((origem, destino))
+        else:
+            # Processa nós
+            if tipo == 'no' and linha != '':
+                partes = linha.split('@@')
+                if len(partes) >= 2:
+                    no_id = partes[1].strip()
+                    descricao = partes[0].strip()
+                    if len(partes) == 3:
+                        opcional = partes[2].strip()
+                        nos.append((no_id, descricao, opcional))
+                    else:
+                        nos.append((no_id, descricao, None))
+            
+            # Processa conexões
+            elif tipo == 'conexao' and linha != '':
+                partes = linha.split('@@')
+                if len(partes) >= 2:
+                    origem = partes[0].strip()
+                    destino = partes[1].strip()
+                    if len(partes) == 3:
+                        condicao = partes[2].strip()
+                    else:
+                        condicao = None
+                    conexoes.append((origem, destino, condicao))
+
+        i += 1
 
     return nos, conexoes
-
 
 def criar_fluxograma(nome_arquivo, resposta):
     dot = graphviz.Digraph(graph_attr={'rankdir': 'LR'})
     nos, conexoes = processar_resposta(resposta)
+    print(nos, conexoes)
     # Adiciona os nós ao diagrama com estilos personalizados
-    for no_id, descricao in nos:
-        print("No: ", no_id, " Descricão: ", descricao)
+    for no in nos:
+        if len(no) == 2:
+            no_id, descricao = no
+            opcional = None
+        elif len(no) == 3:
+            no_id, descricao, opcional = no
+        else:
+            raise ValueError(f"Nó inesperado encontrado: {no}")
+
+        print("No: ", no_id, " Descrição: ", descricao, " Opcional: ", opcional)
+        
         if descricao:
             dot.node(no_id, descricao, shape='box', style='filled', fillcolor='lightblue', fontname='Arial', fontsize='10')
         else:
@@ -53,8 +71,8 @@ def criar_fluxograma(nome_arquivo, resposta):
 
     # Adiciona as conexões ao diagrama com estilos personalizados
     for conexao in conexoes:
-        origem = conexao[0][-1]  # Obtém o último caractere da origem (que é o ID do nó)
-        destino = conexao[1][0]  # Obtém o primeiro caractere do destino (que é o ID do nó)
+        origem = conexao[0]
+        destino = conexao[1]
         if len(conexao) == 3:
             condicao = conexao[2]
             dot.edge(origem, destino, label=condicao, color='gray', fontname='Arial', fontsize='8')
@@ -69,5 +87,6 @@ def criar_fluxograma(nome_arquivo, resposta):
     Conexões - Condição para ir para o próximo nó
     '''
     dot.attr(label=legenda, labelloc="bottom", labeljust="left")
+    
     # Renderiza o gráfico
     dot.render(nome_arquivo, view=True)

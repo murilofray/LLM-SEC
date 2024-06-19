@@ -5,7 +5,7 @@ from backend.db import mysql
 from backend.llm import chain_invoke
 from backend.user import Usuario
 from backend.funcoes import *
-from backend.projectresume import processar_e_resumir_arquivos, salvar_resumo_em_arquivo
+# from backend.projectresume import processar_e_resumir_arquivos
 from io import BytesIO
 import os
 import shutil
@@ -113,7 +113,7 @@ def get_response(chat_id):
     data = request.get_json()
     mensagem_usuario = data.get("message")
     mensagem_usuario_inicial = mensagem_usuario
-    resposta_servidor = chain_invoke(mensagem_usuario, texto,"")
+    resposta_servidor = chain_invoke(mensagem_usuario, texto)
     texto = ""
     # Salva a mensagem do usuário e a resposta do servidor no banco de dados
     print(resposta_servidor)
@@ -266,64 +266,64 @@ def chat_arquivo():
     else:
         return "Tipo de arquivo não permitido.", 400
 
-@index_routes.route("/project-input", methods=["POST"])
-@login_required
-def project_input():
-    if "file" not in request.files:
-        return "Nenhum arquivo enviado.", 400
+# @index_routes.route("/project-input", methods=["POST"])
+# @login_required
+# def project_input():
+#     if "file" not in request.files:
+#         return "Nenhum arquivo enviado.", 400
 
-    files = request.files.getlist("file")  # Get all files from the request
-    print(files)
-    user_folder = os.path.join('backend', 'projects')
+#     files = request.files.getlist("file")  # Get all files from the request
+#     print(files)
+#     user_folder = os.path.join('backend', 'projects')
 
-    if not os.path.exists(user_folder):
-        os.makedirs(user_folder)
-    primeiro_arquivo = True
-    for arquivo in files:
-        if arquivo.filename == "":
-            return "Nenhum arquivo selecionado.", 400
+#     if not os.path.exists(user_folder):
+#         os.makedirs(user_folder)
+#     primeiro_arquivo = True
+#     for arquivo in files:
+#         if arquivo.filename == "":
+#             return "Nenhum arquivo selecionado.", 400
 
-        if arquivo:
-            filename = arquivo.filename
-            if primeiro_arquivo:
-                output_txt_path = os.path.dirname(filename)
-            file_path = os.path.join(user_folder, filename)
+#         if arquivo:
+#             filename = arquivo.filename
+#             if primeiro_arquivo:
+#                 output_txt_path = os.path.dirname(filename)
+#             file_path = os.path.join(user_folder, filename)
             
-            # Create directories if they don't exist
-            os.makedirs(os.path.dirname(file_path), exist_ok=True)
-            print(arquivo.filename)
-            arquivo.save(file_path)
-            primeiro_arquivo = False
-    output_txt_path = os.path.join(user_folder, output_txt_path)
-    resumo_final = processar_e_resumir_arquivos(output_txt_path)
-    return "Arquivos enviado e vetorizado com sucesso.", 200
+#             # Create directories if they don't exist
+#             os.makedirs(os.path.dirname(file_path), exist_ok=True)
+#             print(arquivo.filename)
+#             arquivo.save(file_path)
+#             primeiro_arquivo = False
+#     output_txt_path = os.path.join(user_folder, output_txt_path)
+#     resumo_final = processar_e_resumir_arquivos(output_txt_path)
+#     return "Arquivos enviado e vetorizado com sucesso.", 200
 
-@index_routes.route('/download/<filename>')
-def download_file(filename):
-    return send_from_directory("C:/Users/muril/Music/Projeto SEC Estagio/LLM-SEC/", filename)
+# @index_routes.route('/download/<filename>')
+# def download_file(filename):
+#     return send_from_directory("C:/Users/muril/Music/Projeto SEC Estagio/LLM-SEC/", filename)
 
-@index_routes.route('/list-directory', methods=['GET'])
-def list_directory():
-    directory_path = "C:/Users/muril/Music/Projeto SEC Estagio/LLM-SEC/backend/projects"
-    print(directory_path)
-    try:
-        files = os.listdir(directory_path)
-        return jsonify({'files': files})
-    except Exception as e:
-        return jsonify({'error': str(e)})
+# @index_routes.route('/list-directory', methods=['GET'])
+# def list_directory():
+#     directory_path = "C:/Users/muril/Music/Projeto SEC Estagio/LLM-SEC/backend/projects"
+#     print(directory_path)
+#     try:
+#         files = os.listdir(directory_path)
+#         return jsonify({'files': files})
+#     except Exception as e:
+#         return jsonify({'error': str(e)})
 
-@index_routes.route('/delete-directory', methods=['DELETE'])
-def delete_directory():
-    directory_name = request.args.get('directory')
-    if not directory_name:
-        return jsonify({'error': 'No directory specified'}), 400
+# @index_routes.route('/delete-directory', methods=['DELETE'])
+# def delete_directory():
+#     directory_name = request.args.get('directory')
+#     if not directory_name:
+#         return jsonify({'error': 'No directory specified'}), 400
     
-    directory_path = os.path.join("C:/Users/muril/Music/Projeto SEC Estagio/LLM-SEC/backend/projects", directory_name)
-    try:
-        if os.path.isdir(directory_path):
-            shutil.rmtree(directory_path)
-            return jsonify({'success': True})
-        else:
-            return jsonify({'error': 'Directory not found'}), 404
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+#     directory_path = os.path.join("C:/Users/muril/Music/Projeto SEC Estagio/LLM-SEC/backend/projects", directory_name)
+#     try:
+#         if os.path.isdir(directory_path):
+#             shutil.rmtree(directory_path)
+#             return jsonify({'success': True})
+#         else:
+#             return jsonify({'error': 'Directory not found'}), 404
+#     except Exception as e:
+#         return jsonify({'error': str(e)}), 500
