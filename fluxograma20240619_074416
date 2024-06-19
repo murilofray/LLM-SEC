@@ -1,0 +1,28 @@
+digraph {
+	graph [rankdir=LR]
+	A [label="Início" fillcolor=lightblue fontname=Arial fontsize=10 shape=box style=filled]
+	B [label="Carregar configurações" fillcolor=lightblue fontname=Arial fontsize=10 shape=box style=filled]
+	C [label="Verificar execução de processos" fillcolor=lightblue fontname=Arial fontsize=10 shape=box style=filled]
+	D [label="Carregar dados de unidades e alunos" fillcolor=lightblue fontname=Arial fontsize=10 shape=box style=filled]
+	E [label="Carregar ordem de execução" fillcolor=lightblue fontname=Arial fontsize=10 shape=box style=filled]
+	F [label="Alocar alunos" fillcolor=lightblue fontname=Arial fontsize=10 shape=box style=filled]
+	G [label="Gerar relatórios" fillcolor=lightblue fontname=Arial fontsize=10 shape=box style=filled]
+	H [label="Atualizar banco de dados" fillcolor=lightblue fontname=Arial fontsize=10 shape=box style=filled]
+	I [label="Enviar emails" fillcolor=lightblue fontname=Arial fontsize=10 shape=box style=filled]
+	J [label=Fim fillcolor=lightblue fontname=Arial fontsize=10 shape=box style=filled]
+	A -> B [color=gray fontname=Arial fontsize=8]
+	B -> C [color=gray fontname=Arial fontsize=8]
+	C -> D [label="[Se processos não estão em execução]" color=gray fontname=Arial fontsize=8]
+	D -> E [color=gray fontname=Arial fontsize=8]
+	E -> F [color=gray fontname=Arial fontsize=8]
+	F -> G [color=gray fontname=Arial fontsize=8]
+	G -> H [color=gray fontname=Arial fontsize=8]
+	H -> I [label="[Se enviar email configurado]" color=gray fontname=Arial fontsize=8]
+	I -> J [color=gray fontname=Arial fontsize=8]
+	label="
+    Legenda:
+    Nós do Fluxograma: Nome da Função 
+                      [Saída Gerada Caso Tenha] - 
+    Conexões - Condição para ir para o próximo nó
+    " labeljust=left labelloc=bottom
+}

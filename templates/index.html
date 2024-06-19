@@ -64,12 +64,11 @@
         <div id="message-form">
             <input type="file" id="chat-input" name="file" accept=".pdf, .doc, .docx, .csv, .txt" style="display: none;">
             <input type="file" id="file-input" name="file" style="display: none;">
-            <input type="file" id="project-input" name="file" webkitdirectory multiple style="display: none;">
             <div id="menu" class="menu">
                 <a href="#" id="option1">Documentos</a>
                 <a href="#" id="option2">Códigos</a>
-                <a href="#" id="option3">Projeto</a>
-                <a href="#" id="option4">Link GitHub</a>
+                <a href="#" id="option3">Projeto #Em Breve</a>
+                <a href="#" id="option4">Link GitHub #Em Breve</a>
             </div>
             <span id="file-span" class="fa-solid fa-paperclip"
             style="background-color:#1877F2;color:#fff;border:none;padding:10px 20px;border-radius:5px;font-size:1em;cursor:pointer;"></span>
@@ -85,33 +84,6 @@
             </div>
         </div>
     </main>
-    <style>
-        #project-button {
-            position: fixed;
-            top: 100px;
-            right: 10px;
-            z-index: 9999;
-        }
-    </style>
-    <button id="project-button" onclick="openProjectPage()">Escolher Projeto</button>
-
-    <script>
-        function openProjectPage() {
-            window.open('projetos', 'Escolher Projeto', 'width=800,height=600');
-        }
-
-        function receiveMessage(event) {
-            if (event.origin !== window.location.origin) {
-                return;
-            }
-            const selectedDirectory = event.data;
-            document.getElementById('selected-directory').textContent = selectedDirectory;
-        }
-
-        window.addEventListener('message', receiveMessage, false);
-    </script>
-
-    <p  id="project-button" style="color: rgb(255, 255, 255);">Diretório selecionado: <span id="selected-directory" style="color: rgba(255,255,255,255);"></span></p>
     <script src="static/scripts/script.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </body>

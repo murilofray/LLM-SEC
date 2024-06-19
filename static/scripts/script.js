@@ -438,7 +438,7 @@ async function updateChatTitle(newTitle, chatId) {
 document.getElementById('file-input').addEventListener('change', function (event) {
   document.getElementById('file-preview').style.display = 'block';
   document.getElementById('message-form').style.pointerEvents = 'none';
-  const file = event.target.files[0];  // Obtém o arquivo selecionado
+  let file = event.target.files[0];  // Obtém o arquivo selecionado
 
   // Crie um objeto FormData para enviar o arquivo
   const formData = new FormData();
@@ -461,22 +461,24 @@ document.getElementById('file-input').addEventListener('change', function (event
       document.getElementById('file-preview').style.display = 'none';
       // Faça qualquer outra coisa que você queira fazer após enviar o arquivo
       document.getElementById('message-form').style.pointerEvents = 'auto';
-
+      // Redefine o input do arquivo para permitir o envio do mesmo arquivo novamente
+      document.getElementById('file-input').value = '';
   })
   .catch(error => {
       console.error('Erro:', error);
       // Oculta a visualização do arquivo em caso de erro
       document.getElementById('file-preview').style.display = 'none';
       document.getElementById('message-form').style.pointerEvents = 'auto';
-
+      // Redefine o input do arquivo para permitir o envio do mesmo arquivo novamente
+      document.getElementById('file-input').value = '';
   });
+  file = "";
 });
 
 document.getElementById('chat-input').addEventListener('change', function (event) {
   document.getElementById('file-preview').style.display = 'block';
   document.getElementById('message-form').style.pointerEvents = 'none';
-  const file = event.target.files[0];  // Obtém o arquivo selecionado
-
+  let file = event.target.files[0];  // Obtém o arquivo selecionado
 
   // Crie um objeto FormData para enviar o arquivo
   const formData = new FormData();
@@ -499,43 +501,46 @@ document.getElementById('chat-input').addEventListener('change', function (event
       document.getElementById('file-preview').style.display = 'none';
       // Faça qualquer outra coisa que você queira fazer após enviar o arquivo
       document.getElementById('message-form').style.pointerEvents = 'auto';
-
+      // Redefine o input do arquivo para permitir o envio do mesmo arquivo novamente
+      document.getElementById('chat-input').value = '';
   })
   .catch(error => {
       console.error('Erro:', error);
       // Oculta a visualização do arquivo em caso de erro
       document.getElementById('file-preview').style.display = 'none';
       document.getElementById('message-form').style.pointerEvents = 'auto';
-
+      // Redefine o input do arquivo para permitir o envio do mesmo arquivo novamente
+      document.getElementById('chat-input').value = '';
   });
-
+  file = "";
 });
 
-document.getElementById('project-input').addEventListener('change', function(event) {
-  const files = event.target.files;
-  const formData = new FormData();
 
-  for (let i = 0; i < files.length; i++) {
-      formData.append('file', files[i]);
-  }
+// document.getElementById('project-input').addEventListener('change', function(event) {
+//   const files = event.target.files;
+//   const formData = new FormData();
 
-  // Faz a requisição POST para o backend
-  fetch('/project-input', {
-      method: 'POST',
-      body: formData
-  })
-  .then(response => {
-      if (!response.ok) {
-          throw new Error('Erro ao enviar o arquivo.');
-      }
-      return response.text();
-  })
-  .then(data => {
-      console.log(data); // Log da resposta do servidor
-      // Faça qualquer coisa que você queira após o envio bem-sucedido
-  })
-  .catch(error => {
-      console.error('Erro:', error);
-      // Trate qualquer erro de envio aqui
-  });
-});
+//   for (let i = 0; i < files.length; i++) {
+//       formData.append('file', files[i]);
+//   }
+
+//   // Faz a requisição POST para o backend
+//   fetch('/project-input', {
+//       method: 'POST',
+//       body: formData
+//   })
+//   .then(response => {
+//       if (!response.ok) {
+//           throw new Error('Erro ao enviar o arquivo.');
+//       }
+//       return response.text();
+//   })
+//   .then(data => {
+//       console.log(data); // Log da resposta do servidor
+//       // Faça qualquer coisa que você queira após o envio bem-sucedido
+//   })
+//   .catch(error => {
+//       console.error('Erro:', error);
+//       // Trate qualquer erro de envio aqui
+//   });
+// });
