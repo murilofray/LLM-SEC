@@ -141,7 +141,7 @@ def add_chat():
     # Insere um novo chat no banco de dados
     cur = mysql.connection.cursor()
     cur.execute(
-        "INSERT INTO chats (title, user_id, chat_id) VALUES (%s, %s, %s)",
+        "INSERT INTO chats (title, user_id, id_gpt) VALUES (%s, %s, %s)",
         (titulo, user_id, thread),
     )
     mysql.connection.commit()
@@ -170,7 +170,7 @@ def get_messages(chat_id):
 
     # Obtém o ID GPT do chat
     cur = mysql.connection.cursor()
-    cur.execute("SELECT chat_id FROM chats WHERE id = %s", (chat_id,))
+    cur.execute("SELECT id_gpt FROM chats WHERE id = %s", (chat_id,))
     thread = cur.fetchone()[0]
     cur.close()
 

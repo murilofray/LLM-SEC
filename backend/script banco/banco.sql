@@ -11,6 +11,7 @@ CREATE TABLE chats (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(40) NOT NULL,
     user_id INT NOT NULL,
+    id_gpt TEXT,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
