@@ -298,10 +298,13 @@ def chat_arquivo():
 #     resumo_final = processar_e_resumir_arquivos(output_txt_path)
 #     return "Arquivos enviado e vetorizado com sucesso.", 200
 
-# @index_routes.route('/download/<filename>')
-# def download_file(filename):
-#     return send_from_directory("C:/Users/muril/Music/Projeto SEC Estagio/LLM-SEC/", filename)
-
+base_directory = os.path.dirname(os.path.abspath(__file__))
+@index_routes.route('/download/<filename>')
+def download_file(filename):
+    # Verifica se o arquivo requisitado existe no diretório base
+    file_path = os.path.join(base_directory,'fluxogramas')
+    print(file_path)
+    return send_from_directory(file_path, filename)
 # @index_routes.route('/list-directory', methods=['GET'])
 # def list_directory():
 #     directory_path = "C:/Users/muril/Music/Projeto SEC Estagio/LLM-SEC/backend/projects"

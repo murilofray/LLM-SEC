@@ -1,5 +1,8 @@
 import graphviz
+import os
 def processar_resposta(resposta_llm):
+    resposta_llm = resposta_llm.replace('*', '')
+    resposta_llm = resposta_llm.replace('#', '')
     nos = []
     conexoes = []
     tipo = None
@@ -49,7 +52,7 @@ def processar_resposta(resposta_llm):
     return nos, conexoes
 
 def criar_fluxograma(nome_arquivo, resposta):
-    dot = graphviz.Digraph(graph_attr={'rankdir': 'LR'})
+    dot = graphviz.Digraph(graph_attr={'rankdir': 'TB'})
     nos, conexoes = processar_resposta(resposta)
     print(nos, conexoes)
     # Adiciona os nós ao diagrama com estilos personalizados
@@ -88,5 +91,10 @@ def criar_fluxograma(nome_arquivo, resposta):
     '''
     dot.attr(label=legenda, labelloc="bottom", labeljust="left")
     
+    # Obter o diretório base onde o app.py está localizado
+    base_directory = os.path.dirname(os.path.abspath(__file__))
+    
+    # Definir o caminho completo do arquivo
+    caminho_arquivo = os.path.join(base_directory, "fluxogramas", nome_arquivo)
     # Renderiza o gráfico
-    dot.render(nome_arquivo, view=True)
+    dot.render(caminho_arquivo, view=False)

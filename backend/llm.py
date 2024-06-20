@@ -85,7 +85,10 @@ def chain_invoke(pergunta, docs):
       answer = agent_arquivo.invoke({"user_question": pergunta, "docs": context, "history": formatted_history})
       answer = answer['answer']
    elif escolha == 2: #prompt fluxograma
-        answer = agent_fluxograma.invoke({"codigo": docs, "user_question": pergunta, "history": formatted_history})
+        answer_inicial = agent_analise_fluxo.invoke({"codigo": docs, "user_question": pergunta})
+        answer_inicial = answer_inicial['answer']
+        print("Anser0: ", answer_inicial)
+        answer = agent_fluxograma.invoke({"descricao_fluxo": answer_inicial, "user_question": pergunta})
         answer = answer['answer']
         print("Anser1: ", answer)
         answer = formata_resposta.invoke({"pergunta": answer})
@@ -96,22 +99,32 @@ def chain_invoke(pergunta, docs):
         caminho_pdf = f"/download/{nome_fluxograma}.pdf"
         nome_fluxograma_com_extensao = nome_fluxograma + ".pdf"
         answer =  f"\n\nClique <a href='{caminho_pdf}' download='{nome_fluxograma_com_extensao}'> aqui </a> para baixar o fluxograma"
+        answer_inicial = "**Definição do fluxograma**: \n\n" + answer_inicial + answer
+        answer = answer_inicial
+        print("Anser3: ", answer)
    elif escolha == 3: #prompt regras
-        answer_regras = agent_regras_negocios.invoke({"codigo": docs, "history": formatted_history})
+        answer_regras = agent_regras_negocios.invoke({"codigo": docs, "history": formatted_history, "pergunta": pergunta})
         answer_regras = answer_regras['answer']
         answer = answer_regras
    elif escolha == 4: #prompt fluxograma e regras
-        answer = agent_fluxograma.invoke({"codigo": docs, "user_question": pergunta, "history": formatted_history})
+        answer_inicial = agent_analise_fluxo.invoke({"codigo": docs, "user_question": pergunta})
+        answer_inicial = answer_inicial['answer']
+        print("Anser0: ", answer_inicial)
+        answer = agent_fluxograma.invoke({"descricao_fluxo": answer_inicial, "user_question": pergunta})
         answer = answer['answer']
+        print("Anser1: ", answer)
         answer = formata_resposta.invoke({"pergunta": answer})
         answer = answer['answer']
+        print("Anser2: ", answer)
         nome_fluxograma = "fluxograma" + datetime.now().strftime("%Y%m%d_%H%M%S")
         criar_fluxograma(nome_fluxograma,answer)
         caminho_pdf = f"/download/{nome_fluxograma}.pdf"
         nome_fluxograma_com_extensao = nome_fluxograma + ".pdf"
-        answer = agent_regras_negocios.invoke({"codigo": docs, "history": formatted_history})
+        answer = agent_regras_negocios.invoke({"codigo": docs, "history": formatted_history, "pergunta": pergunta})
         answer = answer['answer']
         answer +=  f"\n\nClique <a href='{caminho_pdf}' download='{nome_fluxograma_com_extensao}'> aqui </a> para baixar o fluxograma"
+        answer_inicial = "**Definição do fluxograma**: \n\n" + answer_inicial + answer
+        answer = answer_inicial
    try:
     history = update_history(history,pergunta, answer)
    except Exception as e:
