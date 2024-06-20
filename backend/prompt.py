@@ -29,7 +29,7 @@ prompt_arquivo = ChatPromptTemplate.from_messages(
             ---------------------------------
             Sua principal tarefa é receber um documento e, a partir dele, gerar os requisitos de negócios, 
             Além disso, você pode responder perguntas sobre o conteúdo do arquivo que não sejam relacionadas a requisitos de negócios, por exemplo: Qual é o tema do documento? Neste caso, você não precisa utilizar a estrutura de requisitos de negócios. 
-
+            Consulte somente o conteúdo do contexto para responder a pergunta e gerar os requisitos de negócios.
             Estrutura dos Requisitos de Negócio:
             Utilize a seguinte estrutura (adicionar, remover ou renomear tópicos se necessário):
 
