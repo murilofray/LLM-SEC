@@ -3,8 +3,8 @@ from langchain_openai import ChatOpenAI
 from backend.prompt import *
 from dotenv import load_dotenv
 import os
-from langchain_google_genai import ChatGoogleGenerativeAI
-from google.generativeai.types.safety_types import HarmBlockThreshold, HarmCategory
+# from langchain_google_genai import ChatGoogleGenerativeAI
+# from google.generativeai.types.safety_types import HarmBlockThreshold, HarmCategory
 
 load_dotenv()
 
