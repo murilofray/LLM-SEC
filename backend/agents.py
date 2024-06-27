@@ -32,7 +32,7 @@ load_dotenv()
 
 llm = ChatOpenAI(
     model="gpt-4o",
-    temperature=0.5,
+    temperature=0.6,
     max_tokens=None,
     timeout=None,
     max_retries=3,
@@ -41,7 +41,7 @@ llm = ChatOpenAI(
 
 llm_fluxo = ChatOpenAI(
     model="gpt-4o",
-    temperature=0,
+    temperature=0.1,
     max_tokens=None,
     timeout=None,
     max_retries=3,
@@ -64,6 +64,8 @@ agent_regras_negocios = LLMChain(llm=llm, prompt=prompt_regras_negocios, output_
 formata_resposta = LLMChain(llm=llm_fluxo, prompt=prompt_verifica_resposta, output_key="answer")
 
 normal_agente = LLMChain(llm=llm, prompt=prompt_normal, output_key="answer")
+
+alteracao_agent = LLMChain(llm=llm, prompt=alteracao_prompt, output_key="answer")
 
 # agent_resume_project = LLMChain(llm=llm, prompt=project_resume_prompt, output_key="answer")
 # agent_fluxograma_geral = LLMChain(llm=llm, prompt=prompt_fluxograma_geral, output_key="answer")

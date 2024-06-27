@@ -7,14 +7,21 @@ inicial_prompt = ChatPromptTemplate.from_messages(
             """
             History memory: {historico}
             ---------------------------------
-            Sua tarefa é identificar qual dos prompts a pergunta do usuário irá utilizar.
-            Existem três prompts: prompt_arquivo, prompt_fluxograma, e prompt_regras. Você pode usar um deles, nenhum ou combinar prompt_regras e prompt_fluxograma juntos.
-            - Fluxograma de código: use prompt_fluxograma.
-            - Regras de negócios: use prompt_regras.
-            - Requisitos de negócio: use prompt_arquivo.
-            Retorne apenas o nome do prompt escolhido. Se nenhum for aplicável, retorne apenas "nenhum".
+            Your task is to identify which of the prompts the user's question will use.
+            There are four prompts: prompt_arquivo, prompt_fluxograma, prompt_regras, and prompt_analise_codigo. You can use one of them or none.
+            
+            - **Code flowchart**: use `prompt_fluxograma` when the question refers to the structure or flow of the code. Examples: "How does this function work?" or "What is the flow of the data in this process?"
+            
+            - **Business rules of the code**: use `prompt_regras` when the question refers to the business rules implemented in the code. Examples: "What business rules are enforced in this function?" or "Describe the rules implemented in this code."
+            
+            - **Business requirements**: use `prompt_arquivo` when the question refers to requirements in a document and/or generating requirements. Examples: "What are the requirements for this project?" or "Generate the business requirements from this document."
+            
+            - **Code modification based on requirements**: use `prompt_analise_codigo` when the question refers to the need for code changes to meet business requirements. Examples: "What changes are needed in the code to meet these requirements?" or "Modify the code to fulfill the new business requirements."
+            
+            Return only the name of the chosen prompt. If none apply, return only "nenhum".
             Pergunta: {user_question}
-            """,
+            Answer in Portuguese Brazil.
+            """
         )
     ]
 )
@@ -27,32 +34,33 @@ prompt_arquivo = ChatPromptTemplate.from_messages(
             """
             History memory: {history}
             ---------------------------------
-            Sua principal tarefa é receber um documento e, a partir dele, gerar os requisitos de negócios, 
-            Além disso, você pode responder perguntas sobre o conteúdo do arquivo que não sejam relacionadas a requisitos de negócios, por exemplo: Qual é o tema do documento? Neste caso, você não precisa utilizar a estrutura de requisitos de negócios. 
-            Consulte somente o conteúdo do contexto para responder a pergunta e gerar os requisitos de negócios.
-            Estrutura dos Requisitos de Negócio:
-            Utilize a seguinte estrutura (adicionar, remover ou renomear tópicos se necessário):
+            Your main task is to receive a document and, from it, generate the business requirements.
+            If the question is about requirements, use the business requirements structure.
+            Also, answer questions about the document's content that are not related to business requirements.
+            For example: "What is the theme of the document?" In this case, you do not need to use the business requirements structure.
+            ITINERÁRIOS FORMATIVOS are the set of disciplines, projects, workshops, study groups, among other work situations, that students can choose in high school.
 
-            Requisitos de Negócios\n
+            Consult only the context content to answer the question and generate business requirements.
 
-            1° - ITINERÁRIOS FORMATIVOS\n
-            [Descrição]\n
-            [Requisitos de negócios geradas]\n
+            Business Requirements Structure:
+            Use the following structure (add, remove or rename topics as needed):
 
-            2° - TRANSFERÊNCIA\n
-            [Descrição]\n
-            [Requisitos de negócios geradas]\n
+            ##Requisitos de Negócios
 
-            3° - DEFINIDOS\n
-            [Descrição]\n
-            [Requisitos de negócios geradas]\n
+            ##1° - [NAME OF TOPIC]\n
+            [Generated business requirements]
 
-            4° - ESTUDANTES FORA DA REDE\n
-            [Descrição]\n
-            [Requisitos de negócios geradas]\n
+            ##2° - [NAME OF TOPIC]\n
+            [Generated business requirements
 
-            Responda a seguinte pergunta: {user_question}\n
-            Usando o seguinte contexto: {docs}\n
+            ##3° - [NAME OF TOPIC]\n
+            [Generated business requirements]
+
+            ...
+
+            Responda a seguinte pergunta: {user_question}
+            Usando o seguinte contexto: {docs}
+            Answer in Portuguese Brazil.
 
             Suas respostas devem ser detalhadas e completas.
             """,
@@ -60,59 +68,60 @@ prompt_arquivo = ChatPromptTemplate.from_messages(
     ]
 )
 
-
 prompt_consulta_vetorial = ChatPromptTemplate.from_messages(
     [
         (
             "user",
             """
             A pergunta do usuário é: '{user_question}'.
-            Gere uma string que melhore a consulta para encontrar o contexto desejado no banco vetorial. Retorne apenas a string.
+            Generate a string to improve the query to find the desired context in the vector database. Return only the string.
+            Answer in Portuguese Brazil.
             """,
         )
     ]
 )
+
 prompt_analise_fluxo = ChatPromptTemplate.from_messages(
     [
         (
             "user",
             """
-            Seu objetivo é analisar a pergunta do usuário e o código fornecido, identificar o fluxo principal de execução e os dados gerados, e estruturar essa informação de maneira clara e consistente para ser usada na geração de um fluxograma textual posteriormente.
+            Your goal is to analyze the user's question and the provided code, identify the main execution flow and the generated data, and structure this information clearly and consistently to be used in generating a textual flowchart later.
 
-            Siga as instruções abaixo para realizar a análise:
+            Follow the instructions below to perform the analysis:
 
-            1. Identifique a função `main` no código e comece a análise a partir dela. Se a pergunta do usuário especificar uma função diferente, comece a análise a partir dessa função.
-            2. Liste todos os processos ou etapas que ocorrem dentro dessa função e as funções chamadas por ela em ordem sequencial.
-            3. Inclua quaisquer condições ou bifurcações importantes.
-            4. Identifique e liste qualquer arquivo ou dado gerado durante a execução do código.
-            5. Tente não criar muitos processos ou etapas. Se você encontrar um processo ou etapa que não seja necessário, ignore-o ou adcione-o como ação em um processo ou etapa anterior.
-            
-            Estruture sua resposta da seguinte maneira:
+            1. Identify the `main` function in the code and start the analysis from there. If the user's question specifies a different function, start the analysis from that function.
+            2. List all processes or steps that occur within that function and the functions it calls sequentially.
+            3. Include any important conditions or branches.
+            4. Identify and list any files or data generated during code execution.
+            5. Try not to create too many processes or steps. If you find an unnecessary process or step, ignore it or add it as an action in a previous process or step.
+
+            Structure your answer as follows:
 
             **Objetivo principal:**
-            - Descreva o objetivo principal do código em uma frase clara.
+            - Describe the main objective of the code in a clear sentence.
 
-            **Principais processos/etapas:**
-            1. [Nome do primeiro processo]
-                - [Descreva as ações ou processos realizados neste processo]
-            2. [Nome do segundo processo]
-                - [Descreva as ações ou processos realizados neste processo]
+            **Principais Processos/Etapas:**
+            1. [Name of the first process]
+                - [Describe the actions or processes performed in this process]
+            2. [Name of the second process]
+                - [Describe the actions or processes performed in this process]
             3. ...
 
             **Condições importantes:**
-            - [Descreva qualquer condição ou bifurcação importante]
+            - [Describe any important condition or branch]
 
             **Arquivos ou dados gerados:**
-            - [Descreva qualquer arquivo ou dado gerado]
+            - [Describe any file or data generated]
 
-            Exemplos:
+            Examples:
 
-            **Exemplo 1**
+            **Example 1**
 
-            **Pergunta:**
-            Como funciona o processo de cálculo de notas dos alunos?
+            **Question:**
+            How does the student grade calculation process work?
 
-            **Código:**
+            **Code:**
             ```
             def main():
                 students = get_students()
@@ -147,104 +156,69 @@ prompt_analise_fluxo = ChatPromptTemplate.from_messages(
                         file.write(f"Student grade['student_id']: grade['grade']\n")
             ```
 
-            **Resposta:**
+            **Answer:**
 
-            **Objetivo principal:**
-            - O código calcula as notas finais dos alunos com base em suas pontuações e salva os resultados em um arquivo.
+            **Main Objective:**
+            - The code calculates the final grades of students based on their scores and saves the results in a file.
 
-            **Principais processos/etapas:**
-            1. Obtenção de Dados dos Alunos
-                - Carrega a lista de alunos e suas pontuações.
-            2. Cálculo de Notas
-                - Calcula o total das pontuações de cada aluno.
-            3. Atribuição de Notas Finais
-                - Atribui uma nota final (A, B, C ou F) com base no total das pontuações.
-            4. Salvamento dos Resultados
-                - Salva as notas finais em um arquivo de texto.
+            **Main Processes/Steps:**
+            1. Student Data Retrieval
+                - Loads the list of students and their scores.
+            2. Grade Calculation
+                - Calculates the total scores for each student.
+            3. Final Grade Assignment
+                - Assigns a final grade (A, B, C, or F) based on the total scores.
+            4. Saving Results
+                - Saves the final grades in a text file.
 
-            **Condições importantes:**
-            - Se o total de pontuações for maior ou igual a 90, o aluno recebe nota A.
-            - Se o total de pontuações for maior ou igual a 80, o aluno recebe nota B.
-            - Se o total de pontuações for maior ou igual a 70, o aluno recebe nota C.
-            - Se o total de pontuações for inferior a 70, o aluno recebe nota F.
+            **Important Conditions:**
+            - If the total scores are greater than or equal to 90, the student receives an A grade.
+            - If the total scores are greater than or equal to 80, the student receives a B grade.
+            - If the total scores are greater than or equal to 70, the student receives a C grade.
+            - If the total scores are less than 70, the student receives an F grade.
 
-            **Arquivos ou dados gerados:**
-            - Arquivo de texto `final_grades.txt` contendo as notas finais dos alunos.
+            **Generated Files or Data:**
+            - `final_grades.txt` text file containing the final grades of students.
 
-            Agora, analise o código a seguir e forneça a descrição de alto nível seguindo estritamente o formato acima, mas adapte conforme necessário para refletir com precisão o funcionamento do código:
+            Now, analyze the following code and provide the high-level description strictly following the format above, but adapt as necessary to accurately reflect the code's operation:
 
-            **Pergunta:**
+            **Question:**
             {user_question}
 
-            **Código:**
+            **Code:**
             {codigo}
+            Answer in Portuguese Brazil.
             """
         )
     ]
 )
-
 
 prompt_fluxograma = ChatPromptTemplate.from_messages(
     [
         (
             "user",
             """
-            Seu objetivo principal é transformar a descrição do fluxo principal de um processo em um fluxograma textual com a visão macro do processo.
+            Your main goal is to transform the main process flow description into a textual flowchart with a macro view of the process.
 
-            **Descrição do Fluxo Principal:**
+            **Main Flow Description:**
 
             {descricao_fluxo}
 
-            Usaremos nós e conexões para desenhar textualmente o fluxograma.
-            Use os processos/etapas como os nós nos fluxogramas.
+            We will use nodes and connections to textually draw the flowchart.
+            Use the processes/steps as nodes in the flowcharts.
 
-            A estrutura dos nós é:
-            NomeNó @@ SiglaNó
+            The node structure is:
+            NodeName @@ NodeAbbreviation
 
-            A estrutura das conexões é:
-            SiglaNó1 @@ SiglaNó2 @@ [Condição] (esse último é opcional, apenas caso tenha)
+            The connection structure is:
+            NodeAbbreviation1 @@ NodeAbbreviation2 @@ [Condition] (this last one is optional, only if there is one)
 
-            Estruture o fluxograma com os seguintes elementos:
-            - Um ponto inicial (Início)
-            - Um ou mais processos intermediários
-            - Um ponto final (Fim)
+            Structure the flowchart with the following elements:
+            - A starting point (Start)
+            - One or more intermediate processes
+            - An end point (End)
 
-            Utilize o seguinte formato para o fluxograma:
-
-            Começo Nós
-
-            Início @@ A
-            Processo @@ BA
-            Decisão @@ C
-            Processo @@ D
-            Fim @@ E
-
-            Fim @@ Nós
-
-            Começo Conexões
-
-            A @@ BA
-            BA @@ C
-            C @@ D @@ [Condição verdadeira]
-            C @@ BA @@ [Condição falsa]
-            D @@ E
-
-            Fim Conexões
-            """
-        )
-    ]
-)
-
-prompt_fluxograma_geral = ChatPromptTemplate.from_messages(
-    [
-        (
-            "user",
-            """
-            Seu objetivo principal é receber um resumo sobre um projeto de software, interpretá-lo e abstrair o entendimento do processo que ele constrói, retornando o desenho do processo.
-
-            Retorne o desenho do processo de forma compreensível pelo usuário, detalhando e explicitando os caminhos do processo.
-
-            Responda no seguinte formato:
+            Use the following format for the flowchart:
 
             Começo Nós
 
@@ -253,75 +227,103 @@ prompt_fluxograma_geral = ChatPromptTemplate.from_messages(
             Decisão @@ C
             Processo @@ D
             Fim @@ E
-
-            Fim @@ Nós
-
-            Começo Conexões
-
-            A @@ BA
-            BA @@ C
-            C @@ D @@ [Condição verdadeira]
-            C @@ BA @@ [Condição falsa]
-            D @@ E
-
-            Fim Conexões
-
-            Aqui está um exemplo adicional para maior clareza:
-
-            Começo Nós
-
-            Início @@ A
-            Processo Ler dados @@ B
-            Decisão Dados @@ C
-            Processo @@ D
-            Processo Mostrar @@ E
-            Fim @@ F
 
             Fim Nós
 
             Começo Conexões
 
-            A @@ B
-            B @@ C
-            C @@ D @@ [Sim]
-            C @@ E @@ [Não]
-            D @@ F
-            E @@ A
+            A @@ BA
+            BA @@ C
+            C @@ D @@ [Condição verdadeira]
+            C @@ BA @@ [Condição falsa]
+            D @@ E
 
             Fim Conexões
-            
-            
-            Adicione mais nós e conexões conforme necessário, seguindo o mesmo formato.
-            Resumo: {resumo}
-            """,
+
+            Answer in Portuguese Brazil.
+            """
         )
     ]
 )
+
+alteracao_prompt = ChatPromptTemplate.from_messages(
+    [
+        (
+            "user",
+            """
+            ### Context
+            You are tasked with analyzing the source code to ensure it meets specified business requirements. Your goal is to identify any gaps between the business requirements and the implemented code. Use the provided information to suggest necessary modifications to align the code with all business requirements.
+
+            ### User's Question
+            {pergunta}
+
+            ### Business Requirements
+            {requisitos}
+
+            ### Business rules extracted from source code
+            {regras}
+
+            ### Current Source Code
+            {codigo}
+
+            ### Task
+            Based on the provided business requirements and the source code, identify which requirements are not being met. Then, suggest modifications to the source code to fulfill all business requirements.
+
+            ### Expected Output
+            1. **Analysis**: Identify the business requirements that are not currently met by the source code.
+            2. **Modification Suggestions**: Provide specific modifications to the source code that address the identified gaps.
+
+            ### Example Output
+
+            **Analysis**
+            Unmet requirement: "The system must generate reports."
+
+            **Modification Suggestions**
+            To meet the requirement of generating reports, add the following function to the existing codebase:
+
+            ```python
+            def generate_report(data):
+                # Logic to generate report
+                report = create_report(data)
+                save_report(report)
+                return report
+            ```
+
+            Ensure your suggestions include specific code changes or additions and do not request the user to create them.
+
+            Answer in Portuguese Brazil.
+            """
+        )
+    ]
+)
+
 
 prompt_regras_negocios = ChatPromptTemplate.from_messages(
     [
         (
             "user",
             """
-            Histórico de memória: {history}
+            Memory History: {history}
             ---------------------------------
-            Seu objetivo principal é receber um código, interpretá-lo e abstrair o entendimento das regras de negócio que ele implementa.
+            Answer in Portuguese Brazil.
+            Your main objective is to receive a code, interpret it, and abstract the understanding of the business rules it implements.
 
-            Definição de regras de negócios: As regras de negócio traduzem um contexto do negócio para o produto ou serviço; descrevem como se espera que o produto se comporte: condições, restrições, gatilhos, etc.
+            Definition of business rules: Business rules translate a business context into a product or service; they describe how the product is expected to behave: conditions, constraints, triggers, etc.
 
-            Instruções:
-            1. Comece com o título "REGRAS DE NEGÓCIO", seguido pelas regras implementadas.
-            2. Para cada regra de negócio, descreva:
-                - O que ela faz (Objetivo - PES).
-                - Como ela é implementada (Detalhes do Código Relevante - AR).
-                - Condições necessárias para sua execução (Critérios - Al).
-                - Restrições aplicadas (Travas - R).
-                - Gatilhos que disparam a regra (Gatilhos).
-            3. Seja detalhado e verboso, fornecendo explicações claras e completas.
+            Instructions:
+            1. Start with the title "REGRAS DE NEGÓCIO", followed by the implemented rules.
+            2. For each business rule, describe:
+                - What it does (Objective - PES).
+                - How it is implemented (Relevant Code Details - AR).
+                - Necessary conditions for its execution (Criteria - Al).
+                - Applied constraints (Constraints - R).
+                - Triggers that activate the rule (Triggers).
+            3. Be detailed and verbose, providing clear and complete explanations every time.
 
-            Código: {codigo}
+            Code: {codigo}
 
-            Pergunta do usuário: {pergunta}
+            User's Question: {user_question}
+            Answer in Portuguese Brazil.
             """,
         )
     ]
@@ -332,12 +334,13 @@ prompt_verifica_resposta = ChatPromptTemplate.from_messages(
         (
             "user",
             """
-            Verifique se a pergunta está formatada exatamente igual ao exemplo, sem formatações markdown como por exemplo ** texto ** ou qualquer outra coisa a mais.
+            Check if the question is formatted exactly like the example, without markdown formatting such as **text** or anything else extra.
+            
+            If it is, return the question unchanged.
+            If it is not, return the response formatted correctly without changing the content of the question.
+            Resposta: {pergunta}
 
-            Caso esteja, retorne a pergunta sem alteração.
-            Caso não esteja, retorne a reposta formatada com as formatações corretas, não alterendo o conteudo da pergunta.
-
-            Exemplo:
+            Example:
 
             Começo Nós
 
@@ -347,7 +350,7 @@ prompt_verifica_resposta = ChatPromptTemplate.from_messages(
             Processo @@ D
             Fim @@ E
 
-            Fim @@ Nós
+            Fim Nós
 
             Começo Conexões
 
@@ -359,89 +362,15 @@ prompt_verifica_resposta = ChatPromptTemplate.from_messages(
 
             Fim Conexões
 
-            Aqui está um exemplo adicional para maior clareza:
-
-            Começo Nós
-
-            Início @@ A
-            Processo Ler dados @@ B
-            Decisão Dados @@ C
-            Processo @@ D
-            Processo Mostrar @@ E
-            Fim @@ F
-
-            Fim Nós
-
-            Começo Conexões
-
-            A @@ B
-            B @@ C
-            C @@ D @@ [Sim]
-            C @@ E @@ [Não]
-            D @@ F
-            E @@ A
-
-            Fim Conexões
-
-            Pergunta: {pergunta}
-            """,
-        )
-    ]
-)
-
-
-project_resume_prompt = ChatPromptTemplate.from_messages(
-    [
-        (
-            "user",
             """
-            Objetivo: Gerar um resumo detalhado de um arquivo específico do projeto, incluindo seu propósito, funções, processos, lógica e dependências.
-
-            Instruções:
-
-            1. Identificação do Arquivo: Informe o nome do arquivo que deseja resumir.
-            2. Descrição do Arquivo:
-              - Descreva o propósito principal do arquivo e suas principais funções.
-              - Detalhe os processos e a lógica subjacente no funcionamento do arquivo.
-              - Liste as dependências externas necessárias para o correto funcionamento do arquivo.
-
-            Formato do Resumo:
-            - O resumo deve ser claro e conciso, organizado em seções distintas para cada aspecto abordado (propósito, funções, processos, lógica, dependências).
-            - Certifique-se de que o resumo ajude na compreensão do arquivo, permitindo uma análise aprofundada de suas funcionalidades e integrações com outros componentes do projeto.
-
-            Exemplo:
-
-            Propósito:
-            O arquivo `arquivo.py` tem como objetivo principal realizar a manipulação de dados do usuário dentro do sistema XYZ.
-
-            Funções:
-            - `funcao_principal`: Responsável por processar dados de entrada e gerar saídas formatadas.
-            - `funcao_auxiliar`: Suporta `funcao_principal` ao realizar operações de validação de dados.
-
-            Processos e Lógica:
-            Este arquivo utiliza uma abordagem de processamento sequencial para validar e processar dados de entrada, aplicando regras específicas de negócios.
-
-            Dependências:
-            - `outro_arquivo.py`: Importado para acesso a funções de utilidade.
-            - `biblioteca_A`: Utilizada para manipulação de strings.
-
-            Arquivo: {arquivo}
-            """,
         )
     ]
 )
 
 prompt_normal = ChatPromptTemplate.from_messages(
     [
-        (
-            "user",
-            """
-            History memory: {history}
-            ---------------------------------
-            Sua principal tarefa é responder a pergunta do usuário de maneira clara e completa, utilizando as informações disponíveis.
-
-            Pergunta: {user_question}
-            """,
-        )
+        ("system", "You are a helpful assistant. Answer in Portuguese Brazil."),
+        MessagesPlaceholder(variable_name="history"),
+        ("user", "{input}, Answer in Portuguese Brazil."),
     ]
 )

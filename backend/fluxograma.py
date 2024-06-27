@@ -86,7 +86,6 @@ def criar_fluxograma(nome_arquivo, resposta):
     legenda = '''
     Legenda:
     Nós do Fluxograma: Nome da Função 
-                      [Saída Gerada Caso Tenha] - 
     Conexões - Condição para ir para o próximo nó
     '''
     dot.attr(label=legenda, labelloc="bottom", labeljust="left")
