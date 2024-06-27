@@ -95,21 +95,20 @@ def chain_invoke(pergunta, docs):
     elif escolha == 2:  # prompt fluxograma
         answer_inicial = agent_analise_fluxo.invoke({"codigo": docs, "user_question": pergunta})
         answer_inicial = answer_inicial['answer']
-        print("Anser0: ", answer_inicial)
         answer = agent_fluxograma.invoke({"descricao_fluxo": answer_inicial, "user_question": pergunta})
         answer = answer['answer']
-        print("Anser1: ", answer)
         answer = formata_resposta.invoke({"pergunta": answer})
         answer = answer['answer']
-        print("Anser2: ", answer)
         nome_fluxograma = "fluxograma" + datetime.now().strftime("%Y%m%d_%H%M%S")
-        criar_fluxograma(nome_fluxograma, answer)
+        try:
+            criar_fluxograma(nome_fluxograma, answer)
+        except:
+            print("Erro ao gerar o fluxograma")
         caminho_pdf = f"/download/{nome_fluxograma}.pdf"
         nome_fluxograma_com_extensao = nome_fluxograma + ".pdf"
         answer = f"\n\nClique <a href='{caminho_pdf}' download='{nome_fluxograma_com_extensao}'> aqui </a> para baixar o fluxograma"
         answer_inicial = "**Definição do fluxograma**: \n\n" + answer_inicial + answer
         answer = answer_inicial
-        print("Anser3: ", answer)
     
     elif escolha == 3:  # prompt regras
         answer_regras = agent_regras_negocios.invoke({"codigo": docs, "history": formatted_history, "user_question": pergunta})

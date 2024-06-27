@@ -91,9 +91,11 @@ def criar_fluxograma(nome_arquivo, resposta):
     dot.attr(label=legenda, labelloc="bottom", labeljust="left")
     
     # Obter o diretório base onde o app.py está localizado
-    base_directory = os.path.dirname(os.path.abspath(__file__))
+    try:
+        base_directory = os.path.dirname(os.path.abspath(__file__))
+        caminho_arquivo = os.path.join(base_directory, "fluxogramas", nome_arquivo)
+    except NameError:
+        caminho_arquivo = "/backend/fluxogramas"
     
-    # Definir o caminho completo do arquivo
-    caminho_arquivo = os.path.join(base_directory, "fluxogramas", nome_arquivo)
     # Renderiza o gráfico
     dot.render(caminho_arquivo, view=False)
