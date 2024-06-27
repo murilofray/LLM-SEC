@@ -113,7 +113,7 @@ prompt_analise_fluxo = ChatPromptTemplate.from_messages(
 
             **Arquivos ou dados gerados:**
             - [Describe any file or data generated]
-
+            Do not use the example in the answer, it is just an example
             Examples:
 
             **Example 1**
@@ -179,7 +179,7 @@ prompt_analise_fluxo = ChatPromptTemplate.from_messages(
 
             **Generated Files or Data:**
             - `final_grades.txt` text file containing the final grades of students.
-
+            Do not use the example in the answer, it is just an example
             Now, analyze the following code and provide the high-level description strictly following the format above, but adapt as necessary to accurately reflect the code's operation:
 
             **Question:**
