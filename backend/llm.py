@@ -84,7 +84,7 @@ def chain_invoke(pergunta, docs):
                 context = context[:30000]
         else:
             context = "Ainda não tem arquivos vetorizados avise o usuario."
-        
+        print(context)
         answer = agent_arquivo.invoke({"user_question": pergunta, "docs": context, "history": formatted_history})
         answer = answer['answer']
         
@@ -120,25 +120,26 @@ def chain_invoke(pergunta, docs):
             file.write(answer)
     
     elif escolha == 4:  # prompt analise codigo
-        if not (os.path.exists("requisitos.txt") and os.path.exists("regras.txt") and docs != ""):
+        if not (os.path.exists("requisitos.txt") and docs != ""):
             answer = ""
             if not os.path.exists("requisitos.txt"):
                 answer = "Por favor, gere os requisitos a partir de um documento antes de continuar."
-            if not os.path.exists("regras.txt"):
-                answer += "\nPor favor, gere as regras de negócios a partir de um código-fonte antes de continuar."
             if docs == "":
                 answer += "\nPor favor, forneça o código-fonte antes de continuar."
             return answer
         with open("requisitos.txt", "r", encoding='utf-8', errors='ignore') as file:
             requisitos_negocio = file.read()
-        with open("regras.txt", "r", encoding='utf-8', errors='ignore') as file:
-            regras_negocio = file.read()
-        print(requisitos_negocio)
+        with open("query.txt", "r", encoding='utf-8', errors='ignore') as file:
+            query = file.read()
+        with open("banco.txt", "r", encoding='utf-8', errors='ignore') as file:
+            database = file.read()
+        print(database)
             
         answer = alteracao_agent.invoke({
             "pergunta": pergunta,
             "requisitos": requisitos_negocio,
-            "regras": regras_negocio,
+            "query": query,
+            "database": database,
             "codigo": docs
         })
         answer = answer['answer']

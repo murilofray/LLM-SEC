@@ -63,7 +63,7 @@ def process_document(files, file_extension):
         else:
             raise ValueError("Unsupported file type")
 
-        text_splitter = TokenTextSplitter(chunk_size=350, chunk_overlap=80)
+        text_splitter = TokenTextSplitter(chunk_size=2000, chunk_overlap=200)
         documents = text_splitter.split_text(raw_text)
         document_objs = [Document(page_content=doc) for doc in documents]
         print(document_objs)

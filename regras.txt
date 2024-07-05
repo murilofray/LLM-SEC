@@ -1,0 +1,52 @@
+# REGRAS DE NEGÓCIO
+
+### Regra 1: Verificar se já existe um processo em execução
+- **Objetivo (PES):** Garantir que não haja sobreposição de processos de cálculo de rotas e compatibilização.
+- **Detalhes Relevantes do Código (AR):** Função `verifica_execucao`. Verifica se os processos "See.Sed.FichaAluno.CalculoRotas" ou "see.sed.fichaaluno.calculorotas" estão rodando.
+- **Critérios de Execução (Al):** Sempre executado antes de iniciar o processo principal.
+- **Restrições Aplicadas (R):** O arquivo será verificado a cada 60 segundos enquanto o processo ainda estiver em execução.
+- **Disparadores (Triggers):** Início do processo principal.
+
+### Regra 2: Carregar Unidades e Alunos
+- **Objetivo (PES):** Atualizar as informações de unidades e alunos do banco de dados ou de arquivos.
+- **Detalhes Relevantes do Código (AR):** Método `CarregarUnidadesEAlunos`. Utiliza dados do banco e arquivos binários para popular as coleções de unidades e alunos.
+- **Critérios de Execução (Al):** Quando `unidades` e `alunos` são requisitados para operações.
+- **Restrições Aplicadas (R):** elementos desatualizados são atualizados e endereços/geolocalizações são validados.
+- **Disparadores (Triggers):** Operações que requerem dados atualizados de unidades e alunos.
+
+### Regra 3: Alocar Alunos
+- **Objetivo (PES):** Alocar Alunos em unidades baseada em inscrições e definição.
+- **Detalhes Relevantes do Código (AR):** Método `AlocarAlunos` e `AlocarAlunosIgnoraEscolha`. Classifica e tenta alocar alunos considerando diversas regras de prioridade.
+- **Critérios de Execução (Al):** Ao iniciar a compatibilização.
+- **Restrições Aplicadas (R):** Diversas, incluindo continuidade, definição, interesse integral, irmãos, gêmeos, deficiência.
+- **Disparadores (Triggers):** Ação de compatibilização pelo usuário.
+
+### Regra 4: Transferência de RPP
+- **Objetivo (PES):** Atualizar status de alunos transferidos e inserir novos registros de acordo com a compatibilização.
+- **Detalhes Relevantes do Código (AR):** Método `TransferenciaRPP`. Realiza várias atualizações e inserções baseadas nos resultados da compatibilização.
+- **Critérios de Execução (Al):** Após a execução da compatibilização.
+- **Restrições Aplicadas (R):** Deve haver registros de mov21imentações dos alunos (REL_COMPAT_TRANSFERENCIA_MOVIMENTACAO) para rodadas específicas.
+- **Disparadores (Triggers):** Conclusão do processo de alocação de alunos.
+
+### Regra 5: Envio de Email após Compatibilização
+- **Objetivo (PES):** Enviar email para aluno/responsável informando a alocação nas escolas.
+- **Detalhes Relevantes do Código (AR):** Método `DisparoEmail`. Busca template de email e envia informações da matrícula.
+- **Critérios de Execução (Al):** O processo terminou sem erros e `EnviarEmail` está definido como `true`.
+- **Restrições Aplicadas (R):** Emails válidos precisam estar disponíveis.
+- **Disparadores (Triggers):** Finalização do processo de compatibilização, caso o envio de emails esteja configurado.
+
+### Regra 6: Log e Exportação de Resultados
+- **Objetivo (PES):** Registrar logs detalhados do processo de compatibilização. 
+- **Detalhes Relevantes do Código (AR):** Funções `GravaLog` e scripts de exportação das etapas.
+- **Critérios de Execução (Al):** Após a finalização das etapas de alocação.
+- **Restrições Aplicadas (R):** Log deve ser detalhado e gravado em um arquivo específico.
+- **Disparadores (Triggers):** Finalização do processo com `GravaLog`.
+
+### Regra 7: Limpeza dos Dados Temporários
+- **Objetivo (PES):** Garantir que os dados temporários e de cache sejam limpos após a execução.
+- **Detalhes Relevantes do Código (AR):** Métodos que finalizam com a execução de `Query.QueryLimpeza`.
+- **Critérios de Execução (Al):** Após toda a execução da compatibilização, antes da gravação final.
+- **Restrições Aplicadas (R):** Deve ser executado independentemente do sucesso ou falha das fases anteriores.
+- **Disparadores (Triggers):** Conclusão do processo principal.
+
+Estas regras de negócio foram derivadas de uma interpretação detalhada do código fornecido. Cada regra foi documentada com seus critérios de execução, detalhes de implementação, restrições e gatilhos.

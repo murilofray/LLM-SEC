@@ -10,13 +10,15 @@ inicial_prompt = ChatPromptTemplate.from_messages(
             Your task is to identify which of the prompts the user's question will use.
             There are four prompts: prompt_arquivo, prompt_fluxograma, prompt_regras, and prompt_analise_codigo. You can use one of them or none.
             
-            - **Code flowchart**: use `prompt_fluxograma` when the question refers to the structure or flow of the code. Examples: "How does this function work?" or "What is the flow of the data in this process?"
+            - **Code flowchart**: use `prompt_fluxograma` when the question refers to the structure or flow of the code. Examples: "What is the flow of the data in this process?"
             
             - **Business rules of the code**: use `prompt_regras` when the question refers to the business rules implemented in the code. Examples: "What business rules are enforced in this function?" or "Describe the rules implemented in this code."
             
             - **Business requirements**: use `prompt_arquivo` when the question refers to requirements in a document and/or generating requirements. Examples: "What are the requirements for this project?" or "Generate the business requirements from this document."
             
             - **Code modification based on requirements**: use `prompt_analise_codigo` when the question refers to the need for code changes to meet business requirements. Examples: "What changes are needed in the code to meet these requirements?" or "Modify the code to fulfill the new business requirements."
+            
+            - Only use the prompts when generating something like a flowchart, business rules, requirement analysis, or code modifications. For questions that do not request generating anything, use "nenhum".
             
             Return only the name of the chosen prompt. If none apply, return only "nenhum".
             Pergunta: {user_question}
@@ -26,7 +28,6 @@ inicial_prompt = ChatPromptTemplate.from_messages(
     ]
 )
 
-
 prompt_arquivo = ChatPromptTemplate.from_messages(
     [
         (
@@ -34,46 +35,90 @@ prompt_arquivo = ChatPromptTemplate.from_messages(
             """
             History memory: {history}
             ---------------------------------
-            Your main task is to receive a document and, from it, generate the business requirements.
-            If the question is about requirements, use the business requirements structure.
-            Also, answer questions about the document's content that are not related to business requirements.
-            For example: "What is the theme of the document?" In this case, you do not need to use the business requirements structure.
-            ITINERÁRIOS FORMATIVOS are the set of disciplines, projects, workshops, study groups, among other work situations, that students can choose in high school.
+            Objective: Identify and list the implementation demands for the process described in the requirements document.
 
-            Consult only the context content to answer the question and generate business requirements.
+            Instructions:
 
-            Business Requirements Structure:
-            Use the following structure (add, remove or rename topics as needed):
+            1. Thoroughly read the document: Carefully review the document, paying attention to all details and sections.
 
-            ##Requisitos de Negócios
+            2. Identify key sections: Locate sections of the document that specify implementation requirements. These may include:
 
-            ##1° - [NAME OF TOPIC]\n
-            [Generated business requirements]
+                - Functional descriptions
+                - Technical requirements
+                - Integrations with external systems
+                - Data migration procedures
+            
+            3. Extract relevant information: For each identified section, extract information about:
 
-            ##2° - [NAME OF TOPIC]\n
-            [Generated business requirements
+                - Specific functionalities that need to be developed or configured.
+                - Technologies or tools that will be used.
+                - Steps required for implementation.
+                - Dependencies and integrations with other systems.
+                - Timelines and schedules.
+                - Necessary human and material resources.
+                - Acceptance criteria and success metrics.
+            
+            4. List the demands: Organize the demands into a clear and structured list. Each item in the list should include:
 
-            ##3° - [NAME OF TOPIC]\n
-            [Generated business requirements]
+                - A brief description of the demand.
+                - The origin of the demand in the document (e.g., section or paragraph).
+                - Specific requirements and implementation steps.
+                - Any dependencies or prerequisites.
+                - Required resources.
+                - Acceptance criteria.
+           
+            Format of the List:
 
-            ...
+            Demanda 1:\n
 
-            Responda a seguinte pergunta: {user_question}
-            Usando o seguinte contexto: {docs}
+            Description: [Brief description of the demand]\n
+            Origin: [Section/Paragraph]\n
+            Requirements: [Details of the requirements]\n
+            Implementation Steps: [Necessary steps]\n
+            Dependencies: [Dependent systems or processes]\n
+            Required Resources: [Human/material resources]\n
+            Acceptance Criteria: [Success metrics]\n
+
+            Demanda 2:\n
+
+            Description: [Brief description of the demand]\n
+            Origin: [Section/Paragraph]\n
+            Requirements: [Details of the requirements]\n
+            Implementation Steps: [Necessary steps]\n
+            Dependencies: [Dependent systems or processes]\n
+            Required Resources: [Human/material resources]\n
+            Acceptance Criteria: [Success metrics]\n
+            Practical Example:\n
+
+            Imagine the document includes a requirement to integrate a new student management module with an existing database system. The demand could be described as follows:
+
+            Demanda 1:\n
+            Description: Integration of the student management module with the existing database.\n
+            Origin: Section 3.2, Paragraph 4\n
+            Requirements: The module must read and write data to the existing SQL database.\n
+            Implementation Steps: Develop integration APIs, conduct connection tests, validate data.\n
+            Dependencies: SQL database system.\n
+            Required Resources: Developers with SQL and API experience, testing environment.\n
+            Acceptance Criteria: Stable connectivity, accurate data read/write operations.\n
+            Finalization:
+
+            After listing all the demands, review the list to ensure completeness and clarity. This list will serve as the foundation for planning and executing the process implementation.
+            Requirements Document: {docs}
+            Question: {user_question}
+
             Answer in Portuguese Brazil.
-
-            Suas respostas devem ser detalhadas e completas.
             """,
         )
     ]
 )
+
 
 prompt_consulta_vetorial = ChatPromptTemplate.from_messages(
     [
         (
             "user",
             """
-            A pergunta do usuário é: '{user_question}'.
+           Question: '{user_question}'.
             Generate a string to improve the query to find the desired context in the vector database. Return only the string.
             Answer in Portuguese Brazil.
             """,
@@ -251,52 +296,54 @@ alteracao_prompt = ChatPromptTemplate.from_messages(
         (
             "user",
             """
-            ### Context
-            You are tasked with analyzing the source code to ensure it meets specified business requirements. Your goal is to identify any gaps between the business requirements and the implemented code. Use the provided information to suggest necessary modifications to align the code with all business requirements.
+            ### Contexto
+            Você está encarregado de analisar o código-fonte para garantir que ele atenda aos requisitos de negócios especificados. Seu objetivo é identificar quaisquer lacunas entre os requisitos de negócios e o código implementado. Use as informações fornecidas para sugerir as modificações necessárias para alinhar o código com todos os requisitos de negócios.
 
-            ### User's Question
+            ### Pergunta do Usuário
             {pergunta}
 
-            ### Business Requirements
+            ### Requisitos de Negócios
             {requisitos}
 
-            ### Business rules extracted from source code
-            {regras}
-
-            ### Current Source Code
+            ### Código-Fonte Atual
             {codigo}
 
-            ### Task
-            Based on the provided business requirements and the source code, identify which requirements are not being met. Then, suggest modifications to the source code to fulfill all business requirements.
+            ### Banco de Dados
+            {database}
 
-            ### Expected Output
-            1. **Analysis**: Identify the business requirements that are not currently met by the source code.
-            2. **Modification Suggestions**: Provide specific modifications to the source code that address the identified gaps.
+            ### Consultas Existentes
+            {query}
 
-            ### Example Output
+            ### Tarefa
+            Com base nos requisitos de negócios fornecidos e no código-fonte, identifique quais requisitos não estão sendo atendidos. Em seguida, sugira modificações no código-fonte para atender a todos os requisitos de negócios.
 
-            **Analysis**
-            Unmet requirement: "The system must generate reports."
+            ### Saída Esperada
+            1. **Análise**: Identifique os requisitos de negócios que não estão sendo atendidos pelo código-fonte.
+            2. **Sugestões de Modificação**: Forneça modificações específicas no código-fonte que abordem as lacunas identificadas.
 
-            **Modification Suggestions**
-            To meet the requirement of generating reports, add the following function to the existing codebase:
+            ### Exemplo de Saída
+
+            **Análise**
+            Requisito não atendido: "O sistema deve gerar relatórios."
+
+            **Sugestões de Modificação**
+            Para atender ao requisito de geração de relatórios, adicione a seguinte função ao código existente:
 
             ```python
             def generate_report(data):
-                # Logic to generate report
+                # Lógica para gerar o relatório
                 report = create_report(data)
                 save_report(report)
                 return report
             ```
 
-            Ensure your suggestions include specific code changes or additions and do not request the user to create them.
+            Certifique-se de que suas sugestões incluam mudanças ou adições específicas ao código e não solicitem ao usuário que as crie.
 
-            Answer in Portuguese Brazil.
+            Responda em português do Brasil.
             """
         )
     ]
 )
-
 
 prompt_regras_negocios = ChatPromptTemplate.from_messages(
     [

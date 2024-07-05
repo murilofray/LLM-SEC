@@ -3,50 +3,50 @@ from langchain_openai import ChatOpenAI
 from backend.prompt import *
 from dotenv import load_dotenv
 import os
-# from langchain_google_genai import ChatGoogleGenerativeAI
-# from google.generativeai.types.safety_types import HarmBlockThreshold, HarmCategory
+from langchain_google_genai import ChatGoogleGenerativeAI
+from google.generativeai.types.safety_types import HarmBlockThreshold, HarmCategory
 
 load_dotenv()
 
 # # # Definiçao do LLM
 
-# safety_settings = {
-#     HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE, 
-#     HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
-#     HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
-#     HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
-# }
+safety_settings = {
+    HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE, 
+    HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
+    HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
+    HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
+}
 
-# llm = ChatGoogleGenerativeAI(
-#     model="gemini-1.5-flash-latest",
-#     temperature=0.4,
-#     safety_settings=safety_settings,
-# )
-
-# llm_fluxo = ChatGoogleGenerativeAI(
-#     model="gemini-1.5-flash-latest",
-#     temperature=0,
-#     safety_settings=safety_settings,
-# )
-
-
-llm = ChatOpenAI(
-    model="gpt-4o",
-    temperature=0.6,
-    max_tokens=None,
-    timeout=None,
-    max_retries=3,
-    api_key=os.getenv("OPENAI_API_KEY"),
+llm = ChatGoogleGenerativeAI(
+    model="gemini-1.5-flash-latest",
+    temperature=0.5,
+    safety_settings=safety_settings,
 )
 
-llm_fluxo = ChatOpenAI(
-    model="gpt-4o",
-    temperature=0.1,
-    max_tokens=None,
-    timeout=None,
-    max_retries=3,
-    api_key=os.getenv("OPENAI_API_KEY"),
+llm_fluxo = ChatGoogleGenerativeAI(
+    model="gemini-1.5-flash-latest",
+    temperature=0,
+    safety_settings=safety_settings,
 )
+
+
+# llm = ChatOpenAI(
+#     model="gpt-4o",
+#     temperature=1,
+#     max_tokens=None,
+#     timeout=None,
+#     max_retries=3,
+#     api_key=os.getenv("OPENAI_API_KEY"),
+# )
+
+# llm_fluxo = ChatOpenAI(
+#     model="gpt-4o",
+#     temperature=0.1,
+#     max_tokens=None,
+#     timeout=None,
+#     max_retries=3,
+#     api_key=os.getenv("OPENAI_API_KEY"),
+# )
 
 #Criação dos agentes
 agent_inicial = LLMChain(llm=llm, prompt=inicial_prompt, output_key="answer")
