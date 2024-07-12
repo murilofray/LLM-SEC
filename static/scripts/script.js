@@ -516,31 +516,31 @@ document.getElementById('chat-input').addEventListener('change', function (event
 });
 
 
-// document.getElementById('project-input').addEventListener('change', function(event) {
-//   const files = event.target.files;
-//   const formData = new FormData();
+document.getElementById('project-input').addEventListener('change', function(event) {
+  const files = event.target.files;
+  const formData = new FormData();
 
-//   for (let i = 0; i < files.length; i++) {
-//       formData.append('file', files[i]);
-//   }
+  for (let i = 0; i < files.length; i++) {
+      formData.append('file', files[i]);
+  }
 
-//   // Faz a requisição POST para o backend
-//   fetch('/project-input', {
-//       method: 'POST',
-//       body: formData
-//   })
-//   .then(response => {
-//       if (!response.ok) {
-//           throw new Error('Erro ao enviar o arquivo.');
-//       }
-//       return response.text();
-//   })
-//   .then(data => {
-//       console.log(data); // Log da resposta do servidor
-//       // Faça qualquer coisa que você queira após o envio bem-sucedido
-//   })
-//   .catch(error => {
-//       console.error('Erro:', error);
-//       // Trate qualquer erro de envio aqui
-//   });
-// });
+  // Faz a requisição POST para o backend
+  fetch('/project-input', {
+      method: 'POST',
+      body: formData
+  })
+  .then(response => {
+      if (!response.ok) {
+          throw new Error('Erro ao enviar o arquivo.');
+      }
+      return response.text();
+  })
+  .then(data => {
+      console.log(data); // Log da resposta do servidor
+      // Faça qualquer coisa que você queira após o envio bem-sucedido
+  })
+  .catch(error => {
+      console.error('Erro:', error);
+      // Trate qualquer erro de envio aqui
+  });
+});

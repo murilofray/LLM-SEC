@@ -44,10 +44,12 @@
     background-color: var(--color-white);
     padding: 70px;
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     text-align: center;
-  }
-  
+    box-shadow: 0 0 0.5rem #034461, 
+    0 0 0.9rem #034461, 
+    0 0 1.2rem #034461; 
+}
+
   #login-logo {
     width: 100px; /* Ajuste conforme necessário */
     height: auto; /* Ajuste conforme necessário */

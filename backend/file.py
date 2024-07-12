@@ -46,7 +46,17 @@ def process_document(files, file_extension):
                     for table in page.extract_tables():
                         for row in table:
                             raw_text += " ".join(str(row)) + "\n"
-        elif file_extension in ["txt", "py", "cs", "java", "cpp", "js", "html", "css"]:
+        elif file_extension in [
+            "txt",
+            "py",
+            "cs",
+            "java",
+            "cpp",
+            "js",
+            "html",
+            "css",
+            "sql",
+        ]:
             print(f"PROCESSANDO {file_extension.upper()}")
             if isinstance(files, BytesIO):
                 files.seek(0)

@@ -4,12 +4,11 @@ from backend.file import *
 from backend.db import mysql
 from backend.llm import chain_invoke
 from backend.user import Usuario
-from backend.funcoes import *
-# from backend.projectresume import processar_e_resumir_arquivos
+from backend.resume_project import *
+from backend.create_graph import processar_codigo_csharp
+from backend.memory import HistoryManager
 from io import BytesIO
 import os
-import shutil
-
 
 login_routes = Blueprint("login_routes", __name__)
 index_routes = Blueprint("index_routes", __name__)
@@ -17,6 +16,8 @@ cadastrar_routes = Blueprint("cadastrar_routes", __name__)
 
 thread = ""
 texto = ""
+history_manager = HistoryManager()
+
 
 # Rota para fazer login
 @login_routes.route("/login", methods=["POST"])
@@ -79,9 +80,11 @@ def cadastro():
 def index():
     return render_template("login.html")
 
+
 @index_routes.route("/projetos")
 def projetos():
     return render_template("projetos.html")
+
 
 # Rota para fazer logout
 @index_routes.route("/logout")
@@ -110,18 +113,18 @@ def home():
 @login_required
 def get_response(chat_id):
     global texto
+    global history_manager
+    history = history_manager.format_history_for_prompt()
     data = request.get_json()
     mensagem_usuario = data.get("message")
-    mensagem_usuario_inicial = mensagem_usuario
-    resposta_servidor = chain_invoke(mensagem_usuario, texto)
+    resposta_servidor = chain_invoke(mensagem_usuario, texto, history)
     texto = ""
-    # Salva a mensagem do usuário e a resposta do servidor no banco de dados
-    print(resposta_servidor)
+    history_manager.update_history(mensagem_usuario, resposta_servidor)
     try:
         cursor = mysql.connection.cursor()
         cursor.execute(
             "INSERT INTO messages (text_usuario, text_servidor, chat_id) VALUES (%s, %s, %s)",
-            (mensagem_usuario_inicial, resposta_servidor, chat_id),
+            (mensagem_usuario, resposta_servidor, chat_id),
         )
         mysql.connection.commit()
         cursor.close()
@@ -147,7 +150,7 @@ def add_chat():
     mysql.connection.commit()
     chat_id = cur.lastrowid
     cur.close()
-
+    history_manager.clear_history()
     # Retorna os dados do chat recém-adicionado
     return jsonify({"chat_id": chat_id, "title": titulo})
 
@@ -156,6 +159,7 @@ def add_chat():
 @login_required
 def get_messages(chat_id):
     global thread
+    global history_manager
     # Consulta o banco de dados para obter as mensagens correspondentes ao chat_id
     cur = mysql.connection.cursor()
     cur.execute("SELECT * FROM messages WHERE chat_id = %s", (chat_id,))
@@ -167,7 +171,10 @@ def get_messages(chat_id):
         {"id": message[0], "usuario": message[1], "servidor": message[2]}
         for message in messages
     ]
-
+    history_manager.clear_history()
+    # Insere as mensagens no histórico usando o HistoryManager
+    for message in formatted_messages:
+        history_manager.update_history(message["usuario"], message["servidor"])
     # Obtém o ID GPT do chat
     cur = mysql.connection.cursor()
     cur.execute("SELECT id_gpt FROM chats WHERE id = %s", (chat_id,))
@@ -241,8 +248,6 @@ def upload_arquivo():
         return "Tipo de arquivo não permitido.", 400
 
 
-
-
 @index_routes.route("/file-document", methods=["POST"])
 @login_required
 def chat_arquivo():
@@ -266,67 +271,49 @@ def chat_arquivo():
     else:
         return "Tipo de arquivo não permitido.", 400
 
-# @index_routes.route("/project-input", methods=["POST"])
-# @login_required
-# def project_input():
-#     if "file" not in request.files:
-#         return "Nenhum arquivo enviado.", 400
 
-#     files = request.files.getlist("file")  # Get all files from the request
-#     print(files)
-#     user_folder = os.path.join('backend', 'projects')
+@index_routes.route("/project-input", methods=["POST"])
+@login_required
+def project_input():
+    if "file" not in request.files:
+        return "Nenhum arquivo enviado.", 400
 
-#     if not os.path.exists(user_folder):
-#         os.makedirs(user_folder)
-#     primeiro_arquivo = True
-#     for arquivo in files:
-#         if arquivo.filename == "":
-#             return "Nenhum arquivo selecionado.", 400
+    files = request.files.getlist("file")  # Get all files from the request
+    print(files)
+    user_folder = os.path.join("backend", "projects")
 
-#         if arquivo:
-#             filename = arquivo.filename
-#             if primeiro_arquivo:
-#                 output_txt_path = os.path.dirname(filename)
-#             file_path = os.path.join(user_folder, filename)
-            
-#             # Create directories if they don't exist
-#             os.makedirs(os.path.dirname(file_path), exist_ok=True)
-#             print(arquivo.filename)
-#             arquivo.save(file_path)
-#             primeiro_arquivo = False
-#     output_txt_path = os.path.join(user_folder, output_txt_path)
-#     resumo_final = processar_e_resumir_arquivos(output_txt_path)
-#     return "Arquivos enviado e vetorizado com sucesso.", 200
+    if not os.path.exists(user_folder):
+        os.makedirs(user_folder)
+    primeiro_arquivo = True
+    folder_name = ""
+    for arquivo in files:
+        if arquivo.filename == "":
+            return "Nenhum arquivo selecionado.", 400
 
-base_directory = os.path.dirname(os.path.abspath(__file__))
-@index_routes.route('/download/<filename>')
+        if arquivo:
+            filename = arquivo.filename
+            if primeiro_arquivo:
+                output_txt_path = os.path.dirname(filename)
+                folder_name = os.path.dirname(filename)
+            file_path = os.path.join(user_folder, filename)
+
+            # Create directories if they don't exist
+            os.makedirs(os.path.dirname(file_path), exist_ok=True)
+            arquivo.save(file_path)
+            primeiro_arquivo = False
+    output_txt_path = os.path.join(user_folder, output_txt_path)
+    diretorio_saida = os.path.join("backend", "outputs", folder_name)
+    os.makedirs(diretorio_saida, exist_ok=True)
+    processar_codigo_csharp(output_txt_path, diretorio_saida)
+    processar_e_resumir_arquivos(output_txt_path, diretorio_saida)
+
+    return "Arquivos enviado e vetorizado com sucesso.", 200
+
+
+@index_routes.route("/download/<filename>")
 def download_file(filename):
+    base_directory = os.path.dirname(os.path.abspath(__file__))
     # Verifica se o arquivo requisitado existe no diretório base
-    file_path = os.path.join(base_directory,'fluxogramas')
+    file_path = os.path.join(base_directory, "fluxogramas")
     print(file_path)
     return send_from_directory(file_path, filename)
-# @index_routes.route('/list-directory', methods=['GET'])
-# def list_directory():
-#     directory_path = "C:/Users/muril/Music/Projeto SEC Estagio/LLM-SEC/backend/projects"
-#     print(directory_path)
-#     try:
-#         files = os.listdir(directory_path)
-#         return jsonify({'files': files})
-#     except Exception as e:
-#         return jsonify({'error': str(e)})
-
-# @index_routes.route('/delete-directory', methods=['DELETE'])
-# def delete_directory():
-#     directory_name = request.args.get('directory')
-#     if not directory_name:
-#         return jsonify({'error': 'No directory specified'}), 400
-    
-#     directory_path = os.path.join("C:/Users/muril/Music/Projeto SEC Estagio/LLM-SEC/backend/projects", directory_name)
-#     try:
-#         if os.path.isdir(directory_path):
-#             shutil.rmtree(directory_path)
-#             return jsonify({'success': True})
-#         else:
-#             return jsonify({'error': 'Directory not found'}), 404
-#     except Exception as e:
-#         return jsonify({'error': str(e)}), 500

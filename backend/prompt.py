@@ -5,25 +5,23 @@ inicial_prompt = ChatPromptTemplate.from_messages(
         (
             "user",
             """
-            History memory: {historico}
-            ---------------------------------
-            Your task is to identify which of the prompts the user's question will use.
-            There are four prompts: prompt_arquivo, prompt_fluxograma, prompt_regras, and prompt_analise_codigo. You can use one of them or none.
-            
-            - **Code flowchart**: use `prompt_fluxograma` when the question refers to the structure or flow of the code. Examples: "What is the flow of the data in this process?"
-            
-            - **Business rules of the code**: use `prompt_regras` when the question refers to the business rules implemented in the code. Examples: "What business rules are enforced in this function?" or "Describe the rules implemented in this code."
-            
-            - **Business requirements**: use `prompt_arquivo` when the question refers to requirements in a document and/or generating requirements. Examples: "What are the requirements for this project?" or "Generate the business requirements from this document."
-            
-            - **Code modification based on requirements**: use `prompt_analise_codigo` when the question refers to the need for code changes to meet business requirements. Examples: "What changes are needed in the code to meet these requirements?" or "Modify the code to fulfill the new business requirements."
-            
-            - Only use the prompts when generating something like a flowchart, business rules, requirement analysis, or code modifications. For questions that do not request generating anything, use "nenhum".
-            
-            Return only the name of the chosen prompt. If none apply, return only "nenhum".
-            Pergunta: {user_question}
-            Answer in Portuguese Brazil.
-            """
+            **Conversation History**: {history}\n
+            ---------------------------------------------------------------\n
+            Your task is to identify which of the prompts the user's question will use. There are four prompts: `prompt_arquivo`, `prompt_fluxograma`, `prompt_regras`, and `prompt_analise_codigo`. You can use one of them or none.
+
+            - **Code flowchart**: Use `prompt_fluxograma` when the question refers to the structure, flow, or creation of a flowchart of the code. Examples: 'Create a flowchart of this code.'
+
+            - **Business rules of the code**: Use `prompt_regras` when the question refers to the business rules implemented in the code. Examples: 'What business rules are enforced in this function?' or 'Describe the rules implemented in this code.'
+
+            - **Business requirements**: Use `prompt_arquivo` when the question refers to requirements in a document and generating requirements. Examples: 'What are the requirements for this project?' or 'Generate the business requirements from this document.'
+
+            - **Code modification based on requirements**: Use `prompt_analise_codigo` when the question refers to the need for code changes to meet requirements, demands, or necessary changes. Examples: 'What changes are needed in the code to meet these requirements?' or 'Modify the code to fulfill the new business requirements.'
+
+            - Only use the prompts when generating something like a flowchart, business rules, requirement analysis, or code modifications. For questions that do not request generating anything, use 'nenhum.'
+
+            Return only the name of the chosen prompt. If none apply, return only 'nenhum.'
+            Question: {user_question}
+            """,
         )
     ]
 )
@@ -33,22 +31,22 @@ prompt_arquivo = ChatPromptTemplate.from_messages(
         (
             "user",
             """
-            History memory: {history}
-            ---------------------------------
-            Objective: Identify and list the implementation demands for the process described in the requirements document.
+            **Conversation History**: {history}\n
+            ---------------------------------------------------------------\n
+            **Objective**: Identify and list the implementation demands for the process described in the requirements document.
 
-            Instructions:
+            **Instructions**:
 
-            1. Thoroughly read the document: Carefully review the document, paying attention to all details and sections.
+            1. **Thoroughly read the document**: Carefully review the document, paying attention to all details and sections.
 
-            2. Identify key sections: Locate sections of the document that specify implementation requirements. These may include:
+            2. **Identify key sections**: Locate sections of the document that specify implementation requirements. These may include:
 
                 - Functional descriptions
                 - Technical requirements
                 - Integrations with external systems
                 - Data migration procedures
-            
-            3. Extract relevant information: For each identified section, extract information about:
+
+            3. **Extract relevant information**: For each identified section, extract information about:
 
                 - Specific functionalities that need to be developed or configured.
                 - Technologies or tools that will be used.
@@ -57,68 +55,69 @@ prompt_arquivo = ChatPromptTemplate.from_messages(
                 - Timelines and schedules.
                 - Necessary human and material resources.
                 - Acceptance criteria and success metrics.
-            
-            4. List the demands: Organize the demands into a clear and structured list. Each item in the list should include:
 
-                - A brief description of the demand.
-                - The origin of the demand in the document (e.g., section or paragraph).
-                - Specific requirements and implementation steps.
-                - Any dependencies or prerequisites.
-                - Required resources.
-                - Acceptance criteria.
-           
-            Format of the List:
+            4. **List the demands**: Organize the demands into a clear and structured list. Each item in the list should include:
 
-            Demanda 1:\n
+                - **Descrição**: A brief description of the demand.
+                - **Origem**: The origin of the demand in the document (e.g., section or paragraph).
+                - **Requerimentos**: Specific requirements and implementation steps.
+                - **Passos de Implementação**: Necessary steps.
+                - **Dependências**: Dependent systems or processes.
+                - **Recursos Necessários**: Required human/material resources.
+                - **Critérios de Aceitação**: Success metrics.
 
-            Description: [Brief description of the demand]\n
-            Origin: [Section/Paragraph]\n
-            Requirements: [Details of the requirements]\n
-            Implementation Steps: [Necessary steps]\n
-            Dependencies: [Dependent systems or processes]\n
-            Required Resources: [Human/material resources]\n
-            Acceptance Criteria: [Success metrics]\n
+            **Formato da Lista**:
 
-            Demanda 2:\n
+            **Demanda 1**:\n
+            **Descrição**: [Brief description of the demand]\n
+            **Origem**: [Section/Paragraph]\n
+            **Requerimentos**: [Details of the requirements]\n
+            **Passos de Implementação**: [Necessary steps]\n
+            **Dependências**: [Dependent systems or processes]\n
+            **Recursos Necessários**: [Human/material resources]\n
+            **Critérios de Aceitação**: [Success metrics]\n
 
-            Description: [Brief description of the demand]\n
-            Origin: [Section/Paragraph]\n
-            Requirements: [Details of the requirements]\n
-            Implementation Steps: [Necessary steps]\n
-            Dependencies: [Dependent systems or processes]\n
-            Required Resources: [Human/material resources]\n
-            Acceptance Criteria: [Success metrics]\n
-            Practical Example:\n
+            **Demanda 2**:\n
+            **Descrição**: [Brief description of the demand]\n
+            **Origem**: [Section/Paragraph]\n
+            **Requerimentos**: [Details of the requirements]\n
+            **Passos de Implementação**: [Necessary steps]\n
+            **Dependências**: [Dependent systems or processes]\n
+            **Recursos Necessários**: [Human/material resources]\n
+            **Critérios de Aceitação**: [Success metrics]\n
+
+            **Practical Example**:
 
             Imagine the document includes a requirement to integrate a new student management module with an existing database system. The demand could be described as follows:
 
-            Demanda 1:\n
-            Description: Integration of the student management module with the existing database.\n
-            Origin: Section 3.2, Paragraph 4\n
-            Requirements: The module must read and write data to the existing SQL database.\n
-            Implementation Steps: Develop integration APIs, conduct connection tests, validate data.\n
-            Dependencies: SQL database system.\n
-            Required Resources: Developers with SQL and API experience, testing environment.\n
-            Acceptance Criteria: Stable connectivity, accurate data read/write operations.\n
-            Finalization:
+            **Demanda 1**:\n
+            **Descrição**: Integration of the student management module with the existing database.\n
+            **Origem**: Section 3.2, Paragraph 4\n
+            **Requerimentos**: The module must read and write data to the existing SQL database.\n
+            **Passos de Implementação**: Develop integration APIs, conduct connection tests, validate data.\n
+            **Dependências**: SQL database system.\n
+            **Recursos Necessários**: Developers with SQL and API experience, testing environment.\n
+            **Critérios de Aceitação**: Stable connectivity, accurate data read/write operations.\n
+
+            **Finalization**:
 
             After listing all the demands, review the list to ensure completeness and clarity. This list will serve as the foundation for planning and executing the process implementation.
-            Requirements Document: {docs}
-            Question: {user_question}
 
-            Answer in Portuguese Brazil.
+            **Requirements Document**: {docs}
+            **Question**: {user_question}
+
+            **Answer in Portuguese Brazil**.
             """,
         )
     ]
 )
-
 
 prompt_consulta_vetorial = ChatPromptTemplate.from_messages(
     [
         (
             "user",
             """
-           Question: '{user_question}'.
+            Question: '{user_question}'.
             Generate a string to improve the query to find the desired context in the vector database. Return only the string.
             Answer in Portuguese Brazil.
             """,
@@ -131,26 +130,28 @@ prompt_analise_fluxo = ChatPromptTemplate.from_messages(
         (
             "user",
             """
+            **Conversation History**: {history}\n
+            ---------------------------------------------------------------\n
             Your goal is to analyze the user's question and the provided code, identify the main execution flow and the generated data, and structure this information clearly and consistently to be used in generating a textual flowchart later.
 
             Follow the instructions below to perform the analysis:
 
-            1. Identify the `main` function in the code and start the analysis from there. If the user's question specifies a different function, start the analysis from that function.
-            2. List all processes or steps that occur within that function and the functions it calls sequentially.
-            3. Include any important conditions or branches.
-            4. Identify and list any files or data generated during code execution.
-            5. Try not to create too many processes or steps. If you find an unnecessary process or step, ignore it or add it as an action in a previous process or step.
+            1. **Identify the `main` function in the code** and start the analysis from there. If the user's question specifies a different function, start the analysis from that function.
+            2. **List all processes or steps** that occur within that function and the functions it calls sequentially.
+            3. **Include any important conditions** or branches.
+            4. **Identify and list any files or data** generated during code execution.
+            5. **Try not to create too many processes or steps**. If you find an unnecessary process or step, ignore it or add it as an action in a previous process or step.
 
             Structure your answer as follows:
 
             **Objetivo principal:**
-            - Describe the main objective of the code in a clear sentence.
+            - [Describe the main objective of the code in a clear sentence]
 
             **Principais Processos/Etapas:**
             1. [Name of the first process]
-                - [Describe the actions or processes performed in this process]
+            - [Describe the actions or processes performed in this process]
             2. [Name of the second process]
-                - [Describe the actions or processes performed in this process]
+            - [Describe the actions or processes performed in this process]
             3. ...
 
             **Condições importantes:**
@@ -158,82 +159,22 @@ prompt_analise_fluxo = ChatPromptTemplate.from_messages(
 
             **Arquivos ou dados gerados:**
             - [Describe any file or data generated]
-            Do not use the example in the answer, it is just an example
-            Examples:
 
-            **Example 1**
+            ### Autorreflexão:
 
-            **Question:**
-            How does the student grade calculation process work?
+            1. **Geração Inicial**:
+            - Generate the initial response based on the provided code.
+            2. **Revisão Crítica**:
+            - Review the initial response, identify strengths and weaknesses, and propose improvements.
+            3. **Iteração**:
+            - Refine the initial response based on the suggestions from the critical review.
+            4. **Ciclo Contínuo**:
+            - Repeat the review and refinement until a satisfactory response is achieved.
 
-            **Code:**
-            ```
-            def main():
-                students = get_students()
-                grades = calculate_grades(students)
-                final_grades = assign_final_grades(grades)
-                save_results(final_grades)
-                print("Process completed")
-
-            def calculate_grades(students):
-                grades = []
-                for student in students:
-                    total = sum(student['scores'])
-                    grades.append(student_id: student['id'], 'total': total)
-                return grades
-
-            def assign_final_grades(grades):
-                final_grades = []
-                for grade in grades:
-                    if grade['total'] >= 90:
-                        final_grades.append('student_id': grade['student_id'], 'grade': 'A')
-                    elif grade['total'] >= 80:
-                        final_grades.append('student_id': grade['student_id'], 'grade': 'B')
-                    elif grade['total'] >= 70:
-                        final_grades.append('student_id': grade['student_id'], 'grade': 'C')
-                    else:
-                        final_grades.append('student_id': grade['student_id'], 'grade': 'F')
-                return final_grades
-
-            def save_results(final_grades):
-                with open('final_grades.txt', 'w') as file:
-                    for grade in final_grades:
-                        file.write(f"Student grade['student_id']: grade['grade']\n")
-            ```
-
-            **Answer:**
-
-            **Main Objective:**
-            - The code calculates the final grades of students based on their scores and saves the results in a file.
-
-            **Main Processes/Steps:**
-            1. Student Data Retrieval
-                - Loads the list of students and their scores.
-            2. Grade Calculation
-                - Calculates the total scores for each student.
-            3. Final Grade Assignment
-                - Assigns a final grade (A, B, C, or F) based on the total scores.
-            4. Saving Results
-                - Saves the final grades in a text file.
-
-            **Important Conditions:**
-            - If the total scores are greater than or equal to 90, the student receives an A grade.
-            - If the total scores are greater than or equal to 80, the student receives a B grade.
-            - If the total scores are greater than or equal to 70, the student receives a C grade.
-            - If the total scores are less than 70, the student receives an F grade.
-
-            **Generated Files or Data:**
-            - `final_grades.txt` text file containing the final grades of students.
-            Do not use the example in the answer, it is just an example
-            Now, analyze the following code and provide the high-level description strictly following the format above, but adapt as necessary to accurately reflect the code's operation:
-
-            **Question:**
-            {user_question}
-
-            **Code:**
-            {codigo}
-            Answer in Portuguese Brazil.
-            """
+            **Code**: {code}
+            **Question**: {user_question}
+            **Answer in Portuguese Brazil.**
+            """,
         )
     ]
 )
@@ -247,7 +188,7 @@ prompt_fluxograma = ChatPromptTemplate.from_messages(
 
             **Main Flow Description:**
 
-            {descricao_fluxo}
+            {flow_description}
 
             We will use nodes and connections to textually draw the flowchart.
             Use the processes/steps as nodes in the flowcharts.
@@ -286,7 +227,7 @@ prompt_fluxograma = ChatPromptTemplate.from_messages(
             Fim Conexões
 
             Answer in Portuguese Brazil.
-            """
+            """,
         )
     ]
 )
@@ -296,62 +237,64 @@ alteracao_prompt = ChatPromptTemplate.from_messages(
         (
             "user",
             """
-            ### Contexto
-            Você está encarregado de analisar o código-fonte para garantir que ele atenda aos requisitos de negócios especificados. Seu objetivo é identificar quaisquer lacunas entre os requisitos de negócios e o código implementado. Use as informações fornecidas para sugerir as modificações necessárias para alinhar o código com todos os requisitos de negócios.
+            ### Context
+            You are in charge of analyzing the source code to ensure it meets the specified business requirements. Your goal is to identify any gaps between the business requirements and the implemented code. Use the provided information to suggest the necessary modifications to align the code with all business requirements.
 
-            ### Pergunta do Usuário
-            {pergunta}
+            ### Context
+            {context}
 
-            ### Requisitos de Negócios
-            {requisitos}
+            ### User Question
+            {user_question}
 
-            ### Código-Fonte Atual
-            {codigo}
+            ### Task
+            Based on the provided business requirements and the source code, identify which requirements are not being met. Then, suggest modifications to the source code to meet all business requirements.
 
-            ### Banco de Dados
-            {database}
+            ### Expected Output
+            1. **Analysis**: Identify the business requirements that are not being met by the source code.
+            2. **Modification Suggestions**: Provide specific modifications to the source code that address the identified gaps.
 
-            ### Consultas Existentes
-            {query}
+            ### Example Output
 
-            ### Tarefa
-            Com base nos requisitos de negócios fornecidos e no código-fonte, identifique quais requisitos não estão sendo atendidos. Em seguida, sugira modificações no código-fonte para atender a todos os requisitos de negócios.
+            **Analysis**
+            Unmet requirement: "The system must generate reports."
 
-            ### Saída Esperada
-            1. **Análise**: Identifique os requisitos de negócios que não estão sendo atendidos pelo código-fonte.
-            2. **Sugestões de Modificação**: Forneça modificações específicas no código-fonte que abordem as lacunas identificadas.
-
-            ### Exemplo de Saída
-
-            **Análise**
-            Requisito não atendido: "O sistema deve gerar relatórios."
-
-            **Sugestões de Modificação**
-            Para atender ao requisito de geração de relatórios, adicione a seguinte função ao código existente:
+            **Modification Suggestions**
+            To meet the reporting requirement, add the following function to the existing code:
 
             ```python
             def generate_report(data):
-                # Lógica para gerar o relatório
+                # Logic to generate the report
                 report = create_report(data)
                 save_report(report)
                 return report
             ```
 
-            Certifique-se de que suas sugestões incluam mudanças ou adições específicas ao código e não solicitem ao usuário que as crie.
+            Ensure your suggestions include specific changes or additions to the code, and do not request the user to create them.
 
-            Responda em português do Brasil.
-            """
+            ### Self-Reflection:
+            # 1. **Initial Generation**: 
+            #     - Generate the initial response based on the provided file.
+            # 2. **Critical Review**:
+            #     - Review the initial response, identify strengths and weaknesses, and propose improvements.
+            # 3. **Iteration**:
+            #     - Refine the initial response based on the suggestions from the critical review.
+            # 4. **Continuous Cycle**:
+            #     - Repeat the review and refinement until a satisfactory response is achieved.
+
+            Answer in Brazilian Portuguese.
+            """,
         )
     ]
 )
+
 
 prompt_regras_negocios = ChatPromptTemplate.from_messages(
     [
         (
             "user",
             """
-            Memory History: {history}
-            ---------------------------------
+            **Conversation History**: {history}\n
+            ---------------------------------------------------------------\n
             Answer in Portuguese Brazil.
             Your main objective is to receive a code, interpret it, and abstract the understanding of the business rules it implements.
 
@@ -367,9 +310,21 @@ prompt_regras_negocios = ChatPromptTemplate.from_messages(
                 - Triggers that activate the rule (Triggers).
             3. Be detailed and verbose, providing clear and complete explanations every time.
 
-            Code: {codigo}
+            Code: {code}
 
             User's Question: {user_question}
+
+            ### Self-Reflection:
+            # 1. **Initial Generation**: 
+            #     - Generate the initial response based on the provided code.
+            # 2. **Critical Review**:
+            #     - Review the initial response, identify strengths and weaknesses, and suggest improvements.
+            # 3. **Iteration**:
+            #     - Refine the initial response based on the critical review suggestions.
+            # 4. **Continuous Cycle**:
+            #     - Repeat the review and refinement process until a satisfactory response is achieved.
+
+
             Answer in Portuguese Brazil.
             """,
         )
@@ -409,15 +364,65 @@ prompt_verifica_resposta = ChatPromptTemplate.from_messages(
 
             Fim Conexões
 
+            """,
+        )
+    ]
+)
+
+project_resume_prompt = ChatPromptTemplate.from_messages(
+    [
+        (
+            "user",
             """
+            Objetivo: Gerar um resumo detalhado de um arquivo específico do projeto, incluindo seu propósito, funções, processos, lógica e dependências.
+            Instruções:
+            1. Identificação do Arquivo: Informe o nome do arquivo que deseja resumir.
+            2. Descrição do Arquivo:
+               - Descreva o propósito principal do arquivo e suas principais funções.
+               - Detalhe os processos e a lógica subjacente no funcionamento do arquivo.
+               - Liste todas as funções do arquivo.
+               - Liste as dependências externas necessárias para o correto funcionamento do arquivo.
+            Formato do Resumo:
+            - O resumo deve ser claro e conciso, organizado em seções distintas para cada aspecto abordado (propósito, funções, processos, lógica, dependências).
+            - Certifique-se de que o resumo ajude na compreensão do arquivo, permitindo uma análise aprofundada de suas funcionalidades e integrações com outros componentes do projeto.
+            Exemplo:
+            Propósito:
+            O arquivo `arquivo.cs` tem como objetivo principal realizar a manipulação de dados do usuário dentro do sistema XYZ.
+            Funções:
+            - `funcao_principal`: Responsável por processar dados de entrada e gerar saídas formatadas.
+                - `Dependências`: 
+                    - `funcao_auxiliar`: Para realizar operações de validação de dados.
+            - `funcao_auxiliar`: Suporta `funcao_principal` ao realizar operações de validação de dados.
+            Processos e Lógica:
+            Este arquivo utiliza uma abordagem de processamento sequencial para validar e processar dados de entrada, aplicando regras específicas de negócios.
+            Dependências:
+            - `outro_arquivo.cs`: Importado para acesso a funções de utilidade.
+            - `biblioteca_A`: Utilizada para manipulação de strings.
+            Arquivo: {arquivo}
+
+            ### Autorreflexão:
+            # 1. **Geração Inicial**: 
+            #     - Gere a resposta inicial com base no arquivo fornecido.
+            # 2. **Revisão Crítica**:
+            #     - Revise a resposta inicial, identifique pontos fortes e fracos, e proponha melhorias.
+            # 3. **Iteração**:
+            #     - Refine a resposta inicial com base nas sugestões da revisão crítica.
+            # 4. **Ciclo Contínuo**:
+            #     - Repita a revisão e refinamento até alcançar uma resposta satisfatória.
+            """,
         )
     ]
 )
 
 prompt_normal = ChatPromptTemplate.from_messages(
     [
-        ("system", "You are a helpful assistant. Answer in Portuguese Brazil."),
-        MessagesPlaceholder(variable_name="history"),
-        ("user", "{input}, Answer in Portuguese Brazil."),
+        (
+            "user",
+            """
+            **Conversation History**: {history}\n
+            ---------------------------------------------------------------\n
+            Question: {user_question}
+            """,
+        )
     ]
 )

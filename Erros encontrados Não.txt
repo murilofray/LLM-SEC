@@ -1,0 +1,19 @@
+Erros encontrados:
+	- Não confiar no LLM para devolver grandes codigos (80% corrigido, falta trocar logica na consulta de funções)
+	- Gerente de escolha Agentes (As vezes ocorre de ele escolher o agente errado)
+	- Front-End ( Erros de tamanho de mensagens e melhorar forma de salvar pdf)
+	
+Melhorias:
+	- Memoria (Usar thread)
+	- Melhorar o fluxo
+	- Processar funções de forma assincrona
+	Futuras:
+		- Poder remover arquivo
+		- Poder remover projeto
+		- Funcionar para multiprojetos
+		- Poder ver quando um projeto terminou de ser enviado
+
+Falta validar (vou validar no kronhos):
+	- Testes integrados
+	- Testes unitarios
+	
